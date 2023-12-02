@@ -8,7 +8,8 @@ RUN mvn package --no-transfer-progress -DskipTests -Dmaven.repo.local=/mvn/.m2nr
 #
 # Package stage
 #
-FROM openjdk:17-alpine
+# FROM openjdk:17-alpine
+FROM amazoncorretto:17-alpine3.17-jdk
 WORKDIR /app
 RUN addgroup -S javagroup && adduser -S javauser -G javagroup && mkdir data
 COPY --from=build /build/target/cws-k8s-scheduler*.jar cws-k8s-scheduler.jar

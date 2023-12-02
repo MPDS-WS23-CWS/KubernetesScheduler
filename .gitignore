@@ -75,3 +75,5 @@ fabric.properties
 target
 
 pom-development.xml
+
+.DS_Store
