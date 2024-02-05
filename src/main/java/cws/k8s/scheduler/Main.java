@@ -1,5 +1,6 @@
 package cws.k8s.scheduler;
 
+import cws.k8s.scheduler.rest.ProvenanceRestClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -62,6 +63,8 @@ public class Main {
 
         log.info( "\n\n\n" + info + "\n" );
 
+        ProvenanceRestClient provClient = new ProvenanceRestClient();
+        log.info(provClient.getTaskData());
     }
 
 }
