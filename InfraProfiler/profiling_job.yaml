@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{JOB_NAME}}
+spec:
+  template:
+    spec:
+      containers:
+      - name: sysbench
+        image: {{SYSBENCH_IMAGE}}
+        command: ["sysbench"]
+        args: ["cpu", "run", "--time=20", "--threads=4"]
+      restartPolicy: Never
+      nodeSelector:
+        kubernetes.io/hostname: {{NODE_NAME}}
+  backoffLimit: 4
