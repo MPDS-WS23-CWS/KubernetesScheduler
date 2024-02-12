@@ -9,6 +9,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
@@ -33,6 +34,12 @@ public class Task {
     @Getter
     @Setter
     private NodeWithAlloc node = null;
+
+
+    // runtime estimates calc. through regression
+    @Getter
+    @Setter
+    private Map<NodeWithAlloc, Integer> nodeRuntimeEstimates;
 
     @Getter
     @Setter
