@@ -12,7 +12,7 @@ NODES=$(kubectl get nodes -o jsonpath='{.items[*].metadata.name}')
 TMP_RESULTS=$(mktemp)
 TMP_SORTED=$(mktemp)
 
-# Initiate all jobs in parallel
+# jobs run in parallel
 JOB_NAMES=()
 for NODE in $NODES; do
     JOB_NAME="sysbench-$(date +%s)-$NODE"
@@ -26,12 +26,10 @@ for NODE in $NODES; do
     kubectl apply -f "$JOB_YAML_FILE" -n $NAMESPACE
 done
 
-# Wait for all jobs to complete
 for JOB_NAME in "${JOB_NAMES[@]}"; do
     kubectl wait --for=condition=complete job/$JOB_NAME --timeout=300s -n $NAMESPACE
 done
 
-# Collect results and cleanup
 for JOB_NAME in "${JOB_NAMES[@]}"; do
     NODE=$(echo $JOB_NAME | sed 's/sysbench-[0-9]*-//')
     EXEC_TIME=$(kubectl logs job/$JOB_NAME -n $NAMESPACE | grep "total time:" | awk '{print $3}' | sed 's/s//')
@@ -46,15 +44,13 @@ done
 
 sort -t, -k2,2n $TMP_RESULTS > $TMP_SORTED
 
-# Calculate factors
 FASTEST_TIME=$(awk -F, 'NR==1 {print $2+0}' $TMP_SORTED)
 
 while IFS=, read -r NODE TIME; do
     TIME=$(echo $TIME | xargs)
     FACTOR=$(echo "scale=10; $TIME / $FASTEST_TIME" | bc)
     
-    # Increase the number of decimal places displayed to capture and display minor differences
-    FACTOR=$(printf "%.6f" "$FACTOR")
+    FACTOR=$(printf "%.7f" "$FACTOR")
     
     echo "$NODE, $TIME, $FACTOR" >> "$CSV_FILE"
 done < $TMP_SORTED

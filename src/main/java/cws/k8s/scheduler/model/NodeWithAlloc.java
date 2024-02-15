@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 @Getter
+@Setter
 @Slf4j
 public class NodeWithAlloc extends Node implements Comparable<NodeWithAlloc> {
 
@@ -26,6 +27,10 @@ public class NodeWithAlloc extends Node implements Comparable<NodeWithAlloc> {
 
     private final List<PodWithAge> startingTaskCopyingData = new LinkedList<>();
 
+    // Keeping track of the node factors
+    private double factor;
+
+    public
     public NodeWithAlloc( String name ) {
         this.kubernetesClient = null;
         this.maxResources = null;

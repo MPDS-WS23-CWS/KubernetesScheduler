@@ -17,6 +17,9 @@ public class Main {
 
     private final BuildProperties buildProperties;
 
+    @Autowired
+    private InfraProfiler InfraProfiler;
+
     Main( @Autowired BuildProperties buildProperties ) {
         this.buildProperties = buildProperties;
     }
@@ -26,6 +29,13 @@ public class Main {
             throw new IllegalArgumentException( "Please define environment variable: SCHEDULER_NAME" );
         }
         SpringApplication.run(Main.class, args);
+    }
+
+    @PostConstruct
+    public void initProfiling() {
+        runProfiling();
+        parseFactor();
+        updateNodeFactors();
     }
 
     @PostConstruct
