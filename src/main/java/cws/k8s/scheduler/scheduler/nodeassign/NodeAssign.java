@@ -13,7 +13,7 @@ public abstract class NodeAssign {
 
     Scheduler scheduler;
 
-    public abstract List<NodeTaskAlignment> getTaskNodeAlignment( List<Task> unscheduledTasks, Map<NodeWithAlloc, Requirements> availableByNode );
+    public abstract List<NodeTaskAlignment> getTaskNodeAlignment(List<Task> unscheduledTasks, Map<NodeWithAlloc, Requirements> availableByNode );
 
     public void registerScheduler(Scheduler scheduler) {
         this.scheduler = scheduler;

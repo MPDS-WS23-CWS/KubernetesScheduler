@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
@@ -103,6 +104,23 @@ public class Task {
         }
         //return cached value
         return inputSize;
+    }
+
+    //return lowest entry of nodeRuntimeEstimate or assign Tasks without a "no-estimate-default" value
+    public int getMinNodeRuntimeEstimate() {
+
+        int noEstimateAvailableDefaultValue = Integer.MAX_VALUE;
+
+        if (this.nodeRuntimeEstimates == null || this.nodeRuntimeEstimates.isEmpty()) {
+            return noEstimateAvailableDefaultValue;
+        } else {
+            return nodeRuntimeEstimates.values()
+                    .stream()
+                    .filter(Objects::nonNull)
+                    .mapToInt(Integer::intValue)
+                    .min()
+                    .orElse(noEstimateAvailableDefaultValue);
+        }
     }
 
     @Override

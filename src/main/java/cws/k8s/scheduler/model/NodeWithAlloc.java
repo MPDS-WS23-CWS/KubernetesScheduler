@@ -7,6 +7,7 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.client.readiness.Readiness;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
@@ -26,18 +27,22 @@ public class NodeWithAlloc extends Node implements Comparable<NodeWithAlloc> {
 
     private final List<PodWithAge> startingTaskCopyingData = new LinkedList<>();
 
+    @Setter
+    private float NodeRanking;
+
     public NodeWithAlloc( String name ) {
         this.kubernetesClient = null;
         this.maxResources = null;
         this.assignedPods = null;
         this.setMetadata( new ObjectMeta() );
         this.getMetadata().setName( name );
+        this.NodeRanking = 1.0f;
     }
 
     public NodeWithAlloc( Node node, KubernetesClient kubernetesClient ) {
 
         this.kubernetesClient = kubernetesClient;
-
+        this.NodeRanking = 1.0f;
         this.setApiVersion( node.getApiVersion() );
         this.setKind( node.getKind() );
         this.setMetadata( node.getMetadata() );

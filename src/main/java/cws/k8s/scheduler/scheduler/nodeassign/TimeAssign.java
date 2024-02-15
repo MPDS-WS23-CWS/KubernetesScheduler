@@ -19,11 +19,11 @@ public class TimeAssign extends NodeAssign {
         final ArrayList<Map.Entry<NodeWithAlloc, Requirements>> entries = new ArrayList<>( availableByNode.entrySet() );
 
         //todo: presumably sort Nodes by Power (1.0, 1.4, 1.7 ...)
-        Collections.sort(entries, Comparator.comparing();
+        entries.sort(Comparator.comparing(entry -> entry.getKey().getNodeRanking()));
 
         for ( final Task task : unscheduledTasks ) {
             final PodWithAge pod = task.getPod();
-            log.info("Pod: " + pod.getName() + " Requested Resources: " + pod.getRequest() );
+            log.info("Pod: " + pod.getName() + " Requested Resources: " + pod.getRequest() + "Task expected runtime:" + task.getNodeRuntimeEstimates().values());
             boolean assigned = false;
             int nodesTried = 0;
             for ( Map.Entry<NodeWithAlloc, Requirements> e : entries ) {
