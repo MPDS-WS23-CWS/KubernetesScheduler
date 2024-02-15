@@ -1,0 +1,8 @@
+Node, Sysbench Time (s), Factor
+minikube-m04, 20.0008, 1.000000
+minikube-m06, 20.0008, 1.000000
+minikube-m05, 20.0011, 1.000015
+minikube-m02, 20.0013, 1.000025
+minikube-m03, 20.0013, 1.000025
+minikube, 20.0015, 1.000035
+minikube-m07, 20.0033, 1.000125
