@@ -63,8 +63,9 @@ public class Main {
 
         log.info( "\n\n\n" + info + "\n" );
 
+        // just for testing:
         ProvenanceRestClient provClient = new ProvenanceRestClient();
-        log.info(provClient.getTaskData());
+        log.info(provClient.getProvenanceData().toString());
     }
 
 }
