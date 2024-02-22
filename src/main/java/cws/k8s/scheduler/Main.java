@@ -50,12 +50,12 @@ public class Main {
     }
 
     // TODO: Think of data structure to not only update the Nodes but also serve the final predicted runtime.
-    @PostConstruct
-    public void initProfiling() {
-        runProfiling();
-        parseFactor();
-        updateNodeFactors();
-    }
+    // @PostConstruct
+    // public void initProfiling() {
+    //     runProfiling();
+    //     parseFactor();
+    //     updateNodeFactors();
+    // }
 
 
 
