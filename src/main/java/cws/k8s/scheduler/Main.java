@@ -1,5 +1,7 @@
 package cws.k8s.scheduler;
 
+import cws.k8s.scheduler.rest.ProvenanceRestClient;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -35,8 +37,8 @@ public class Main {
 
     private final BuildProperties buildProperties;
 
-    @Autowired
-    private InfraProfiler InfraProfiler;
+    // @Autowired
+    // private InfraProfiler InfraProfiler;
 
     Main( @Autowired BuildProperties buildProperties ) {
         this.buildProperties = buildProperties;

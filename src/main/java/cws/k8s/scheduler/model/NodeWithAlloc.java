@@ -6,6 +6,7 @@ import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.client.readiness.Readiness;
+import lombok.Setter;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,9 +29,8 @@ public class NodeWithAlloc extends Node implements Comparable<NodeWithAlloc> {
     private final List<PodWithAge> startingTaskCopyingData = new LinkedList<>();
 
     // Keeping track of the node factors
-    private double factor;
+    //private double factor;
 
-    public
     public NodeWithAlloc( String name ) {
         this.kubernetesClient = null;
         this.maxResources = null;
