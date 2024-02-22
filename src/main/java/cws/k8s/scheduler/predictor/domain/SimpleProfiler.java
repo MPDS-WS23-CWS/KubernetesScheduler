@@ -1,4 +1,4 @@
-package cws.k8s.scheduler.util
+package cws.k8s.scheduler.predictor;
 
 import io.fabric8.kubernetes.api.model.Node;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
