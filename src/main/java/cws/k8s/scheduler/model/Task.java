@@ -9,6 +9,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -120,6 +121,18 @@ public class Task {
                     .mapToInt(Integer::intValue)
                     .min()
                     .orElse(noEstimateAvailableDefaultValue);
+        }
+    }
+
+    public void updateRuntimePredictions(List<NodeWithAlloc> nodeList){
+        //todo Call regressionmodel to get predicted runtime for top node
+        String name = this.config.getName();
+        long inputsize = this.inputSize;
+
+        int bestPredictedRuntime = 0;
+        this.nodeRuntimeEstimates.clear();
+        for( NodeWithAlloc node: nodeList){
+            nodeRuntimeEstimates.put(node, (int)(bestPredictedRuntime * node.getNodeRanking()));
         }
     }
 
