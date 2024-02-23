@@ -95,6 +95,8 @@ public class Main {
 
         log.info( "\n\n\n" + info + "\n" );
 
+
+        // Needs to call both getProvenanceData and Preprocessor periodically to directly process new map entries.
         // just for testing:
         ProvenanceRestClient provClient = new ProvenanceRestClient();
         log.info(provClient.getProvenanceData().toString());
