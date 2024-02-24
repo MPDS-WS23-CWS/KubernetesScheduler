@@ -1,6 +1,7 @@
 package cws.k8s.scheduler.predictor.model;
 
 import cws.k8s.scheduler.predictor.model.Tuple;
+import cws.k8s.scheduler.predictor.model.PreProcessor;
 import cws.k8s.scheduler.predictor.model.RegressionModelCalculator;
 import cws.k8s.scheduler.rest.ProvenanceRestClient;
 import cws.k8s.scheduler.rest.TaskProvenance;
@@ -17,10 +18,17 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-@Setter
 public class Predictor extends RegressionModelCalculator {
 
     private static final Logger logger = LoggerFactory.getLogger(Predictor.class);
+
+    private Map<String, List<Tuple<Long, Integer>>> nonCorrelatedData; 
+
+    public void getNonCorrelatedData(Map<String, List<Tuple<Long, Integer>>> nonCorrelatedDataMap) {
+
+        this.nonCorrelatedData = nonCorrelatedDataMap;
+
+    }
 
     // Hold models for each process in the map
     private Map<String, SimpleRegression> fittedModels = new HashMap<>();
@@ -45,7 +53,21 @@ public class Predictor extends RegressionModelCalculator {
     @Override
     public double predictRuntime(String processName, double inputSize) {
 
-        // Add here the check if the Scheduler asks to predict a process name that is known to not correlate.
+        // Add the check if the Scheduler asks to predict a process name that is known to not correlate.
+        if (nonCorrelatedData.containsKey(processName)) {
+
+            List<Tuple<Long, Integer>> tuples = nonCorrelatedData.get(processName);
+
+            DescriptiveStatistics stats = new DescriptiveStatistics();
+
+            for (Tuple<Long, Integer> tuple : tuples) {
+
+                stats.addValue(tuple.getRuntime());
+            }
+
+            return stats.getPercentile(50);
+
+        }
 
         SimpleRegression regression = fittedModels.get(processName);
 

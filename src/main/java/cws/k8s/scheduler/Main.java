@@ -2,6 +2,7 @@ package cws.k8s.scheduler;
 
 import cws.k8s.scheduler.predictor.domain.SimpleProfiler;
 import cws.k8s.scheduler.rest.ProvenanceRestClient;
+import cws.k8s.scheduler.predictor.model.PreProcessor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,8 +91,13 @@ public class Main {
 
         ProvenanceRestClient provClient = new ProvenanceRestClient();
         log.info(provClient.getProvenanceData().toString());
+
+        // Crerate PreProcessor object to process data and fit models
+        PreProcessor preProcessor = new PreProcessor();
+        preProcessor.splitData(provClient.getProvenanceData());
         
     }
+
 
 }
 

@@ -16,17 +16,25 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class PreProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(PreProcessor.class);
-    
-    public Map<String, List<Tuple<Long, Integer>>> splitData(Map<String, List<TaskProvenance>> processProvenanceMap) {
+
+    public Map<String, List<Tuple<Long, Integer>>> nonCorrelatedData = new HashMap<>(); 
+
+    // Maybe we need second return of the nonCorrelatedData here
+
+    public void splitData(Map<String, List<TaskProvenance>> processProvenanceMap) {
 
         Map<String, List<Tuple<Long, Integer>>> processKeyedDataSets = new HashMap<>();
 
-        //PearsonsCorrelation pearsonsCorrelation = new PearsonsCorrelation();
-        //SpearmansCorrelation spearmansCorrelation = new SpearmansCorrelation();
+        PearsonsCorrelation pearsonsCorrelation = new PearsonsCorrelation();
+        SpearmansCorrelation spearmansCorrelation = new SpearmansCorrelation();
 
         // Process the data for each key in the Map
         for (Map.Entry<String, List<TaskProvenance>> entry : processProvenanceMap.entrySet()) {
@@ -37,48 +45,42 @@ public class PreProcessor {
 
             List<Tuple<Long, Integer>> allData = new ArrayList<>();
 
-            // TODO: Add correlation analysis and exclude non-correlating map entries.
-            // 
-
             for (TaskProvenance taskProvenance : taskProvenances) {
                 allData.add(new Tuple<>((long) taskProvenance.inputSize, (int) taskProvenance.runtime));
             }
 
-            // double [] inputSizes = tuples.stream().mapToDouble(Tuple::getInputSize).toArray();
-            // double [] runtimes = tuples.stream().mapToDouble(Tuple::getRuntime).toArray();
-            // double pearson = pearsonsCorrelation.correlation(inputSizes, runtimes);
-            // double spearman = spearmansCorrelation.correlation(inputSizes, runtimes);
+            double[] inputSizes = allData.stream().mapToDouble(tuple -> tuple.getInputSize()).toArray();
+            double[] runtimes = allData.stream().mapToDouble(tuple -> tuple.getRuntime()).toArray();
+            double pearson = pearsonsCorrelation.correlation(inputSizes, runtimes);
+            double spearman = spearmansCorrelation.correlation(inputSizes, runtimes);
 
-            // List<Tuple<Double, Double>> processedData;
 
-            // if (pearson < 0.75 || spearman < 0.75 || Double.isNaN(pearson) || Double.isNaN(spearman)) {
-            //     DescriptiveStatistics stats = new DescriptiveStatistics(runtimes);
-            //     double median = stats.getPercentile(50);
-            //     processedData= new ArrayList<>();
+            if (pearson < 0.75 || spearman < 0.75 || Double.isNaN(pearson) || Double.isNaN(spearman)) {
 
-            //     for (double inputSize : inputSizes) {
-            //         processedData.add(new Tuple<>(inputSize, median));
-            //     }
-            // } else {
+                // If threshold is not met, then add to other list for scheduler to access.
+                nonCorrelatedData.put(key, allData);
+                logger.info("Data for process {} is not correlated ", key);
+                continue; 
 
-            //     processedData = new ArrayList<>(tuples);
-        
+            }
 
-            // If correlation works use processed data instead of allData here
             Collections.shuffle(allData, new Random());
 
             int splitIndex = (int) (allData.size() * 0.8);
 
             List<Tuple<Long, Integer>> trainingData = new ArrayList<>(allData.subList(0, splitIndex));
 
-            processKeyedDataSets.put(key, trainingData); // testData needs to be excluded.
+            processKeyedDataSets.put(key, trainingData);
 
         }
 
-        return processKeyedDataSets;
+        Predictor predictor = new Predictor();
+        predictor.fitModels(processKeyedDataSets);
     }
 
 }
+
+
 
 
 // Notes:
