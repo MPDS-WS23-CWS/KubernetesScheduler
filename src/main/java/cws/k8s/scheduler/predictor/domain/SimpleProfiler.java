@@ -47,7 +47,7 @@ public class SimpleProfiler {
         try {
 
             ProcessBuilder pb = new ProcessBuilder("./kube_profiler.sh");
-            pb.directory(new File("../../../../../../InfraProfiler/Bash/kube_profiler.sh"));
+            pb.directory(new File("../../../../../../../../InfraProfiler/Bash/kube_profiler.sh"));
             pb.redirectErrorStream(true);
             Process process = pb.start();
 
@@ -63,18 +63,20 @@ public class SimpleProfiler {
             process.waitFor();
 
             log.info("Profiling was executed successfully.");
+
             return 1;
 
         } catch (IOException | InterruptedException e) {
             log.error("Error executing benchmark script", e);
             Thread.currentThread().interrupt();
+            
             return 0;
         }
     }
 
     public void parseFactor() {
 
-        Path csvPath = Paths.get("../../../../../../InfraProfiler/Bash/benchmark_results.csv");
+        Path csvPath = Paths.get("../../../../../../../../InfraProfiler/Bash/benchmark_results.csv");
         
         try {
 
@@ -96,14 +98,17 @@ public class SimpleProfiler {
                             .findFirst();
 
                     if (existingProfileOpt.isPresent()) {
-                        // If exists, update the existing profile
+
                         NodeProfile existingProfile = existingProfileOpt.get();
-                        existingProfile.setExecTime(execTime); // Assuming you want to overwrite
-                        existingProfile.setFactor(factor); // Assuming you want to overwrite
+
+                        // Werden bei neuem run dann overwritten
+                        existingProfile.setExecTime(execTime); 
+                        existingProfile.setFactor(factor); 
                     
                     } else {
-                        // If not exists, add a new profile
+
                         nodeProfiles.add(new NodeProfile(nodeName, execTime, factor));
+                        log.info("New Node Profile was added.")
                     }
                 }
             }
@@ -113,9 +118,11 @@ public class SimpleProfiler {
     }
 
     // public void updateNodeFactors() {
+
     //     for (NodeProfile profile : nodeProfiles) {
+
     //         kubernetesClient.getallNodes().stream()
-    //         .filter(node -> node.getName().equals(profile.getNodeName()))
+    //         .filter(node -> node.getName().equals(profile.getNodeName());
     //         .findFirst()
     //         .ifPresent(node -> node.setFactor(profile.getFactor()));
     //     }
