@@ -1,15 +1,12 @@
-package cws.k8s.scheduler.predictor;
+package cws.k8s.scheduler.predictor.domain;
 
-import io.fabric8.kubernetes.api.model.Node;
-import io.fabric8.kubernetes.api.model.ObjectMeta;
-import io.fabric8.kubernetes.api.model.Quantity;
-import cws.k8s.scheduler.client.Informable;
 import cws.k8s.scheduler.model.NodeWithAlloc;
 import cws.k8s.scheduler.model.Task;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 
-@Service
+@Component
 @Slf4j
 public class SimpleProfiler {
 
@@ -45,8 +42,10 @@ public class SimpleProfiler {
     }
 
 
-    public void runProfiling() {
+    public int runProfiling() {
+
         try {
+
             ProcessBuilder pb = new ProcessBuilder("./kube_profiler.sh");
             pb.directory(new File("../../../../../../InfraProfiler/Bash/kube_profiler.sh"));
             pb.redirectErrorStream(true);
@@ -55,15 +54,21 @@ public class SimpleProfiler {
             // Read the benchmark results
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
+
             while ((line = reader.readLine()) != null) {
+
                 log.info(line);
             }
 
             process.waitFor();
+
             log.info("Profiling was executed successfully.");
+            return 1;
+
         } catch (IOException | InterruptedException e) {
             log.error("Error executing benchmark script", e);
             Thread.currentThread().interrupt();
+            return 0;
         }
     }
 

@@ -1,9 +1,11 @@
 package cws.k8s.scheduler;
 
+import cws.k8s.scheduler.predictor.domain.SimpleProfiler;
 import cws.k8s.scheduler.rest.ProvenanceRestClient;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.info.BuildProperties;
@@ -13,24 +15,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-// Imports from original main
-// TODO: Check, if better to split up functionality from main into classes because SpringBoot initializes everything.
-/*
-import domain.HistoricTask;
-import estimators.*;
-import helper.*;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.javatuples.Septet;
-import org.javatuples.Triplet;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.DoubleStream;
-*/
-
 @SpringBootApplication
 @Slf4j
 public class Main {
@@ -38,7 +22,7 @@ public class Main {
     private final BuildProperties buildProperties;
 
     // @Autowired
-    // private InfraProfiler InfraProfiler;
+    // private SimpleProfiler simpleProfiler;
 
     Main( @Autowired BuildProperties buildProperties ) {
         this.buildProperties = buildProperties;
@@ -50,16 +34,6 @@ public class Main {
         }
         SpringApplication.run(Main.class, args);
     }
-
-    // TODO: Think of data structure to not only update the Nodes but also serve the final predicted runtime.
-    // @PostConstruct
-    // public void initProfiling() {
-    //     runProfiling();
-    //     parseFactor();
-    //     updateNodeFactors();
-    // }
-
-
 
     @PostConstruct
     private void logVersion() {
@@ -95,11 +69,29 @@ public class Main {
 
         log.info( "\n\n\n" + info + "\n" );
 
+    }
 
-        // Needs to call both getProvenanceData and Preprocessor periodically to directly process new map entries.
-        // just for testing:
+    // @PostConstruct
+    // public void initializeProfiling() {
+
+    //     if(simpleProfiler.runProfiling() == 1) {
+
+    //         simpleProfiler.parseFactor(); 
+
+    //     } else {
+
+    //         log.error("Profiling failed. Skipping factor parsing."); 
+    // }
+    // }
+
+
+    @Scheduled(fixedRate = 10000)
+    public void scheduledProvenanceDataFetch() {
+
         ProvenanceRestClient provClient = new ProvenanceRestClient();
         log.info(provClient.getProvenanceData().toString());
+        
     }
 
 }
+
