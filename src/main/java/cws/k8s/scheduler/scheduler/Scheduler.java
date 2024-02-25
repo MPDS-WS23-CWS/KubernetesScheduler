@@ -7,6 +7,7 @@ import cws.k8s.scheduler.client.Informable;
 import cws.k8s.scheduler.client.KubernetesClient;
 import cws.k8s.scheduler.util.NodeTaskAlignment;
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.PodBuilder;
 import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
 import io.fabric8.kubernetes.client.WatcherException;
@@ -100,6 +101,12 @@ public abstract class Scheduler implements Informable {
         int failure = 0;
         int scheduled = 0;
         for (NodeTaskAlignment nodeTaskAlignment : taskNodeAlignment) {
+            try {
+                addInputSizeLabel( nodeTaskAlignment );
+            }  catch ( Exception e ){
+                log.info( "Could not add input size label to pod {}", nodeTaskAlignment.task.getPod().getName() );
+                e.printStackTrace();
+            }
             try {
                 if (isClose()) {
                     return -1;
@@ -545,5 +552,16 @@ public abstract class Scheduler implements Informable {
 
     }
 
+    /* Provenance */
+
+    /**
+     * Add input size label to pod. Allows provenance collector to scrape this data.
+     */
+    void addInputSizeLabel(NodeTaskAlignment alignment) {
+        PodWithAge pod = alignment.task.getPod();
+
+        client.pods().inNamespace(pod.getMetadata().getNamespace()).withName(pod.getName()).edit(p ->
+                new PodBuilder(p).editMetadata().addToLabels("input_size", String.valueOf(alignment.task.getInputSize())).and().build());
+    }
 
 }

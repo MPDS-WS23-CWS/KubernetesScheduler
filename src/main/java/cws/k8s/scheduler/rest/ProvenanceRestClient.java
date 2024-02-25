@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ProvenanceRestClient {
     private final WebClient webClient;
@@ -18,11 +19,16 @@ public class ProvenanceRestClient {
     // maps process names to TaskProvenance objects
     public Map<String, List<TaskProvenance>> getProvenanceData() {
         String tasksJSON = fetchData("/tasks");
-        String resourceJSON = fetchData("/resources");
 
         Map<String, TaskProvenance> taskProvenanceMap = new HashMap<>();
         parseTaskProvenance(tasksJSON, taskProvenanceMap);
-        parseResourceProvenance(resourceJSON, taskProvenanceMap);
+
+        // exclude tasks where the input size is unknown (i.e. -1)
+        taskProvenanceMap = taskProvenanceMap
+                .entrySet()
+                .stream()
+                .filter(t -> t.getValue().getInputSize() != -1)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         Map<String, List<TaskProvenance>> processProvenanceMap = new HashMap<>();
         for (TaskProvenance taskProvenance : taskProvenanceMap.values()) {
@@ -56,25 +62,9 @@ public class ProvenanceRestClient {
             int startTime = task.getInt("start_time");
             int endTime = task.getInt("end_time");
             int runtime = endTime - startTime;
-            TaskProvenance taskProvenance = new TaskProvenance(podId, processName, nodeName, runtime);
+            long inputSize = task.getLong("input_size");
+            TaskProvenance taskProvenance = new TaskProvenance(podId, processName, nodeName, runtime, inputSize);
             taskProvenanceMap.put(podId, taskProvenance);
-        }
-    }
-
-    private void parseResourceProvenance(String jsonString, Map<String, TaskProvenance> taskProvenanceMap) {
-        JSONArray taskResources = new JSONArray(jsonString);
-        for (int i = 0; i < taskResources.length(); i++) {
-            JSONObject task = taskResources.getJSONObject(i);
-            String podId = task.getString("pod_id");
-            long inputSize;
-            if (task.isNull("fs_reads_total")) {
-                inputSize = -1;
-            } else {
-                inputSize = task.getLong("fs_reads_total");
-            }
-            if (taskProvenanceMap.containsKey(podId)) {
-                taskProvenanceMap.get(podId).setInputSize(inputSize);
-            }
         }
     }
 }
