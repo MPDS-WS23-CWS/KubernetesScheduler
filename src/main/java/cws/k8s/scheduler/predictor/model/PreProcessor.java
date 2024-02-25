@@ -25,7 +25,7 @@ public class PreProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(PreProcessor.class);
 
-    public Map<String, List<Tuple<Long, Integer>>> nonCorrelatedData = new HashMap<>(); 
+//    public Map<String, List<Tuple<Long, Integer>>> nonCorrelatedData = new HashMap<>();
 
     // Maybe we need second return of the nonCorrelatedData here
 
@@ -33,8 +33,8 @@ public class PreProcessor {
 
         Map<String, List<Tuple<Long, Integer>>> processKeyedDataSets = new HashMap<>();
 
-        PearsonsCorrelation pearsonsCorrelation = new PearsonsCorrelation();
-        SpearmansCorrelation spearmansCorrelation = new SpearmansCorrelation();
+//        PearsonsCorrelation pearsonsCorrelation = new PearsonsCorrelation();
+//        SpearmansCorrelation spearmansCorrelation = new SpearmansCorrelation();
 
         // Process the data for each key in the Map
         for (Map.Entry<String, List<TaskProvenance>> entry : processProvenanceMap.entrySet()) {
@@ -49,20 +49,20 @@ public class PreProcessor {
                 allData.add(new Tuple<>((long) taskProvenance.inputSize, (int) taskProvenance.runtime));
             }
 
-            double[] inputSizes = allData.stream().mapToDouble(tuple -> tuple.getInputSize()).toArray();
-            double[] runtimes = allData.stream().mapToDouble(tuple -> tuple.getRuntime()).toArray();
-            double pearson = pearsonsCorrelation.correlation(inputSizes, runtimes);
-            double spearman = spearmansCorrelation.correlation(inputSizes, runtimes);
+//            double[] inputSizes = allData.stream().mapToDouble(tuple -> tuple.getInputSize()).toArray();
+//            double[] runtimes = allData.stream().mapToDouble(tuple -> tuple.getRuntime()).toArray();
+//            double pearson = pearsonsCorrelation.correlation(inputSizes, runtimes);
+//            double spearman = spearmansCorrelation.correlation(inputSizes, runtimes);
 
 
-            if (pearson < 0.75 || spearman < 0.75 || Double.isNaN(pearson) || Double.isNaN(spearman)) {
-
-                // If threshold is not met, then add to other list for scheduler to access.
-                nonCorrelatedData.put(key, allData);
-                logger.info("Data for process {} is not correlated ", key);
-                continue; 
-
-            }
+//            if (pearson < 0.75 || spearman < 0.75 || Double.isNaN(pearson) || Double.isNaN(spearman)) {
+//
+//                // If threshold is not met, then add to other list for scheduler to access.
+//                nonCorrelatedData.put(key, allData);
+//                logger.info("Data for process {} is not correlated ", key);
+//                continue;
+//
+//            }
 
             Collections.shuffle(allData, new Random());
 

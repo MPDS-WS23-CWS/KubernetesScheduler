@@ -14,14 +14,15 @@ public class TaskProvenance {
 
     public int runtime;
 
-    public long inputSize; // fs_reads_total in bytes
+    public long inputSize;
 
 
-    public TaskProvenance(String podId, String processName, String nodeName, int runtime) {
+    public TaskProvenance(String podId, String processName, String nodeName, int runtime, long inputSize) {
         this.podId = podId;
         this.processName = processName;
         this.nodeName = nodeName;
         this.runtime = runtime;
+        this.inputSize = inputSize;
     }
 
     public String toString() {

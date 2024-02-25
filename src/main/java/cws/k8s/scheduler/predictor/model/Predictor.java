@@ -54,20 +54,20 @@ public class Predictor extends RegressionModelCalculator {
     public double predictRuntime(String processName, double inputSize) {
 
         // Add the check if the Scheduler asks to predict a process name that is known to not correlate.
-        if (nonCorrelatedData.containsKey(processName)) {
-
-            List<Tuple<Long, Integer>> tuples = nonCorrelatedData.get(processName);
-
-            DescriptiveStatistics stats = new DescriptiveStatistics();
-
-            for (Tuple<Long, Integer> tuple : tuples) {
-
-                stats.addValue(tuple.getRuntime());
-            }
-
-            return stats.getPercentile(50);
-
-        }
+//        if (nonCorrelatedData.containsKey(processName)) {
+//
+//            List<Tuple<Long, Integer>> tuples = nonCorrelatedData.get(processName);
+//
+//            DescriptiveStatistics stats = new DescriptiveStatistics();
+//
+//            for (Tuple<Long, Integer> tuple : tuples) {
+//
+//                stats.addValue(tuple.getRuntime());
+//            }
+//
+//            return stats.getPercentile(50);
+//
+//        }
 
         SimpleRegression regression = fittedModels.get(processName);
 
