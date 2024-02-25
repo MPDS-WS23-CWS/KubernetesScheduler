@@ -22,7 +22,7 @@ public abstract class RegressionModelCalculator {
 
     /**
      * Predicting runtime for a given process and input size using the fitted model.
-     * @param processname passed by scheduler
+     * @param processName passed by scheduler
      * @param inputSize passed by scheduler to get prediction
      * @return Predicted runtime for process based on input size.
      */
