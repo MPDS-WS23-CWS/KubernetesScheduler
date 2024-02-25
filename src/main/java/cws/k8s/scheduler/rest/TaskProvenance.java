@@ -8,13 +8,13 @@ import lombok.Setter;
 public class TaskProvenance {
     private String podId;
 
-    private String processName;
+    public String processName;
 
-    private String nodeName;
+    public String nodeName;
 
-    private int runtime;
+    public int runtime;
 
-    private long inputSize; // fs_reads_total in bytes
+    public long inputSize; // fs_reads_total in bytes
 
 
     public TaskProvenance(String podId, String processName, String nodeName, int runtime) {

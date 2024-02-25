@@ -1,8 +1,12 @@
 package cws.k8s.scheduler;
 
+import cws.k8s.scheduler.predictor.domain.SimpleProfiler;
 import cws.k8s.scheduler.rest.ProvenanceRestClient;
+import cws.k8s.scheduler.predictor.model.PreProcessor;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.info.BuildProperties;
@@ -17,6 +21,9 @@ import java.util.Date;
 public class Main {
 
     private final BuildProperties buildProperties;
+
+    // @Autowired
+    // private SimpleProfiler simpleProfiler;
 
     Main( @Autowired BuildProperties buildProperties ) {
         this.buildProperties = buildProperties;
@@ -64,8 +71,36 @@ public class Main {
         log.info( "\n\n\n" + info + "\n" );
 
         // just for testing:
-        ProvenanceRestClient provClient = new ProvenanceRestClient();
-        log.info(provClient.getProvenanceData().toString());
+//        ProvenanceRestClient provClient = new ProvenanceRestClient();
+//        log.info(provClient.getProvenanceData().toString());
     }
 
+    // @PostConstruct
+    // public void initializeProfiling() {
+
+    //     if(simpleProfiler.runProfiling() == 1) {
+
+    //         simpleProfiler.parseFactor();
+
+    //     } else {
+
+    //         log.error("Profiling failed. Skipping factor parsing.");
+    // }
+    // }
+
+
+    @Scheduled(fixedRate = 10000)
+    public void scheduledProvenanceDataFetch() {
+
+        ProvenanceRestClient provClient = new ProvenanceRestClient();
+        log.info(provClient.getProvenanceData().toString());
+
+        // Crerate PreProcessor object to process data and fit models
+        PreProcessor preProcessor = new PreProcessor();
+        preProcessor.splitData(provClient.getProvenanceData());
+
+    }
+
+
 }
+

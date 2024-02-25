@@ -6,6 +6,7 @@ import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.client.readiness.Readiness;
+import lombok.Setter;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,6 +14,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 @Getter
+@Setter
 @Slf4j
 public class NodeWithAlloc extends Node implements Comparable<NodeWithAlloc> {
 
@@ -25,6 +27,9 @@ public class NodeWithAlloc extends Node implements Comparable<NodeWithAlloc> {
     private final Map<String, Requirements> assignedPods;
 
     private final List<PodWithAge> startingTaskCopyingData = new LinkedList<>();
+
+    // Keeping track of the node factors
+    //private double factor;
 
     public NodeWithAlloc( String name ) {
         this.kubernetesClient = null;
