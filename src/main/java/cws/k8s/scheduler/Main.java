@@ -22,8 +22,8 @@ public class Main {
 
     private final BuildProperties buildProperties;
 
-    // @Autowired
-    // private SimpleProfiler simpleProfiler;
+    @Autowired
+    private SimpleProfiler simpleProfiler;
 
     Main( @Autowired BuildProperties buildProperties ) {
         this.buildProperties = buildProperties;
@@ -72,18 +72,18 @@ public class Main {
 
     }
 
-    // @PostConstruct
-    // public void initializeProfiling() {
+    @PostConstruct
+    public void initializeProfiling() {
 
-    //     if(simpleProfiler.runProfiling() == 1) {
+        if(simpleProfiler.runProfiling() == 1) {
 
-    //         simpleProfiler.parseFactor(); 
+            simpleProfiler.parseFactor(); 
 
-    //     } else {
+        } else {
 
-    //         log.error("Profiling failed. Skipping factor parsing."); 
-    // }
-    // }
+            log.error("Profiling failed. Skipping factor parsing."); 
+    }
+    }
 
 
     @Scheduled(fixedRate = 10000)
@@ -93,7 +93,7 @@ public class Main {
         log.info(provClient.getProvenanceData().toString());
 
         // Crerate PreProcessor object to process data and fit models
-        PreProcessor preProcessor = new PreProcessor();
+        PreProcessor preProcessor = new PreProcessor(simpleProfiler);
         preProcessor.splitData(provClient.getProvenanceData());
         
     }

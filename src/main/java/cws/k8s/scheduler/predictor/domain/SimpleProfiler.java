@@ -108,7 +108,7 @@ public class SimpleProfiler {
                     } else {
 
                         nodeProfiles.add(new NodeProfile(nodeName, execTime, factor));
-                        log.info("New Node Profile was added.")
+                        log.info("New Node Profile was added.");
                     }
                 }
             }
