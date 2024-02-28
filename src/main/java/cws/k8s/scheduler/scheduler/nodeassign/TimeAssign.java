@@ -16,23 +16,23 @@ public class TimeAssign extends NodeAssign {
     public List<NodeTaskAlignment> getTaskNodeAlignment(List<Task> unscheduledTasks, Map<NodeWithAlloc, Requirements> availableByNode
     ){
         LinkedList<NodeTaskAlignment> alignment = new LinkedList<>();
-        final ArrayList<Map.Entry<NodeWithAlloc, Requirements>> entries = new ArrayList<>( availableByNode.entrySet() );
-
-        //todo: presumably sort Nodes by Power (1.0, 1.4, 1.7 ...)
-        entries.sort(Comparator.comparing(entry -> entry.getKey().getNodeRanking()));
-
+        //ArrayList<Map.Entry<NodeWithAlloc, Requirements>> entries = new ArrayList<>( availableByNode.entrySet() );
+        List<NodeWithAlloc> nodes = new ArrayList<>(availableByNode.keySet());
         for ( final Task task : unscheduledTasks ) {
             final PodWithAge pod = task.getPod();
-            log.info("Pod: " + pod.getName() + " Requested Resources: " + pod.getRequest() + "Task expected runtime:" + task.getNodeRuntimeEstimates().values());
+            log.info("Pod: " + pod.getName() + " Requested Resources: " + pod.getRequest());
             boolean assigned = false;
             int nodesTried = 0;
-            for ( Map.Entry<NodeWithAlloc, Requirements> e : entries ) {
-                final NodeWithAlloc node = e.getKey();
+
+            sortNodesByRuntime(nodes, task);
+
+            for ( NodeWithAlloc node : nodes) {
                 if ( scheduler.canSchedulePodOnNode( availableByNode.get( node ), pod, node ) ) {
                     nodesTried++;
                     alignment.add(new NodeTaskAlignment( node, task));
                     availableByNode.get( node ).subFromThis(pod.getRequest());
                     log.info("--> " + node.getName());
+                    log.info("expected runtime: " + task.getNodeRuntimeEstimates().get(node));
                     assigned = true;
                     task.getTraceRecord().foundAlignment();
                     break;
@@ -47,6 +47,13 @@ public class TimeAssign extends NodeAssign {
 
     }
 
-
+    //Sorts nodes fast->slow for task
+    public void sortNodesByRuntime(List<NodeWithAlloc> nodes, Task task){
+        Map<NodeWithAlloc, Integer> taskRuntimeEst = task.getNodeRuntimeEstimates();
+        Collections.sort(nodes, Comparator.comparingInt(node -> {
+            Integer runtime = taskRuntimeEst.get(node);
+            return runtime != null ? runtime : Integer.MAX_VALUE;
+        }));
+    }
 
 }

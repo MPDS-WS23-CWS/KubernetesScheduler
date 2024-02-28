@@ -9,6 +9,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -59,6 +60,7 @@ public class Task {
     public Task( TaskConfig config, DAG dag ) {
         this.config = config;
         this.process = dag.getByProcess( config.getTask() );
+        this.nodeRuntimeEstimates = new HashMap<>();
     }
 
     public String getWorkingDir(){
@@ -107,20 +109,15 @@ public class Task {
         return inputSize;
     }
 
-    //return lowest entry of nodeRuntimeEstimate or assign Tasks without a "no-estimate-default" value
-    public int getMinNodeRuntimeEstimate() {
-
-        int noEstimateAvailableDefaultValue = Integer.MAX_VALUE;
-
+    public Integer getMinNodeRuntimeEstimate() {
         if (this.nodeRuntimeEstimates == null || this.nodeRuntimeEstimates.isEmpty()) {
-            return noEstimateAvailableDefaultValue;
+            return null;
         } else {
             return nodeRuntimeEstimates.values()
                     .stream()
                     .filter(Objects::nonNull)
-                    .mapToInt(Integer::intValue)
-                    .min()
-                    .orElse(noEstimateAvailableDefaultValue);
+                    .min(Integer::compareTo)
+                    .orElse(null);
         }
     }
 
@@ -129,11 +126,17 @@ public class Task {
         String name = this.config.getName();
         long inputsize = this.inputSize;
 
-        int bestPredictedRuntime = 0;
-        this.nodeRuntimeEstimates.clear();
+        Integer bestPredictedRuntime = -1;
+        clearRuntimePredictions();
         for( NodeWithAlloc node: nodeList){
+            if (bestPredictedRuntime != null){
             nodeRuntimeEstimates.put(node, (int)(bestPredictedRuntime * node.getNodeRanking()));
+            }
         }
+    }
+
+    public  void clearRuntimePredictions(){
+        if (this.nodeRuntimeEstimates != null) this.nodeRuntimeEstimates.clear();
     }
 
     @Override
