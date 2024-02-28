@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: sysbench-daemonset
+spec:
+  selector:
+    matchLabels:
+      name: sysbench
+  template:
+    metadata:
+      labels:
+        name: sysbench
+    spec:
+      containers:
+      - name: sysbench
+        image: nfomin/sysbench-image
+        command: ["/bin/sh", "-c"]
+        args:
+          - sysbench --test=cpu --cpu-max-prime=20000 run > /data/$(NODE_NAME)-sysbench-output.txt &&
+            sleep infinity
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        volumeMounts:
+          - name: data
+            mountPath: /data
+          - name: input
+            mountPath: /input
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: api-exp-data
+        - name: input
+          persistentVolumeClaim:
+            claimName: api-exp-input
