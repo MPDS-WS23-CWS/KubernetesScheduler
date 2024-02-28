@@ -18,7 +18,7 @@ public class ProvenanceRestClient {
 
     // maps process names to TaskProvenance objects
     public Map<String, List<TaskProvenance>> getProvenanceData() {
-        String tasksJSON = fetchData("/tasks");
+        String tasksJSON = fetchData("/tasks","pod_id,process_name,node_name,start_time,end_time,input_size");
 
         Map<String, TaskProvenance> taskProvenanceMap = new HashMap<>();
         parseTaskProvenance(tasksJSON, taskProvenanceMap);
@@ -44,9 +44,14 @@ public class ProvenanceRestClient {
         return processProvenanceMap;
     }
 
-    private String fetchData(String path) {
+    private String fetchData(String path, String select) {
         return webClient.get()
-                .uri(uriBuilder -> uriBuilder.scheme("http").host(provenanceDbApiUrl).port(provenanceDbApiPort).path(path).build())
+                .uri(uriBuilder -> uriBuilder.scheme("http")
+                        .host(provenanceDbApiUrl)
+                        .port(provenanceDbApiPort)
+                        .path(path)
+                        .queryParam("select", select)
+                        .build())
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
