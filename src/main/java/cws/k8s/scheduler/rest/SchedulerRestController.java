@@ -125,7 +125,7 @@ public class SchedulerRestController {
                             case "random": case "r": assign = new RandomNodeAssign(); break;
                             case "roundrobin": case "rr": assign = new RoundRobinAssign(); break;
                             case "fair": case "f": assign = new FairAssign(); break;
-                            case "time" : case "t": assign = new TimeAssign(); break;
+                            case "time" : assign = new TimeAssign(); break;
                             default:
                                 return new ResponseEntity<>( "No Assign for: " + split[1], HttpStatus.NOT_FOUND );
                         }
