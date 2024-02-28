@@ -6,12 +6,16 @@ import cws.k8s.scheduler.predictor.model.PreProcessor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.info.BuildProperties;
 
 import jakarta.annotation.PostConstruct;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
+import org.springframework.web.reactive.function.client.WebClient;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -92,6 +96,18 @@ public class Main {
         preProcessor.splitData(provClient.getProvenanceData());
         
      }
+
+    @Bean
+    // avoid DataBufferLimitException for provenance storage
+    public WebClient webClient() {
+        final int size = 256 * 1024 * 1024;
+        final ExchangeStrategies strategies = ExchangeStrategies.builder()
+                .codecs(codecs -> codecs.defaultCodecs().maxInMemorySize(size))
+                .build();
+        return WebClient.builder()
+                .exchangeStrategies(strategies)
+                .build();
+    }
 
 }
 
