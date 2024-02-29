@@ -40,8 +40,8 @@ public class PreProcessor {
 
         Map<String, List<Tuple<Long, Integer>>> processKeyedDataSets = new HashMap<>();
 
-        PearsonsCorrelation pearsonsCorrelation = new PearsonsCorrelation();
-        SpearmansCorrelation spearmansCorrelation = new SpearmansCorrelation();
+        // PearsonsCorrelation pearsonsCorrelation = new PearsonsCorrelation();
+        // SpearmansCorrelation spearmansCorrelation = new SpearmansCorrelation();
 
         // Process the data for each key in the Map
         for (Map.Entry<String, List<TaskProvenance>> entry : processProvenanceMap.entrySet()) {
@@ -65,20 +65,20 @@ public class PreProcessor {
                 allData.add(new Tuple<>((long) taskProvenance.inputSize, (int) adjustedRuntime));
             }
 
-            double[] inputSizes = allData.stream().mapToDouble(tuple -> tuple.getInputSize()).toArray();
-            double[] runtimes = allData.stream().mapToDouble(tuple -> tuple.getRuntime()).toArray();
-            double pearson = pearsonsCorrelation.correlation(inputSizes, runtimes);
-            double spearman = spearmansCorrelation.correlation(inputSizes, runtimes);
+            // double[] inputSizes = allData.stream().mapToDouble(tuple -> tuple.getInputSize()).toArray();
+            // double[] runtimes = allData.stream().mapToDouble(tuple -> tuple.getRuntime()).toArray();
+            // double pearson = pearsonsCorrelation.correlation(inputSizes, runtimes);
+            // double spearman = spearmansCorrelation.correlation(inputSizes, runtimes);
 
 
-            if (pearson < 0.75 || spearman < 0.75 || Double.isNaN(pearson) || Double.isNaN(spearman)) {
+            // if (pearson < 0.75 || spearman < 0.75 || Double.isNaN(pearson) || Double.isNaN(spearman)) {
 
-                // If threshold is not met, then add to other list for scheduler to access.
-                nonCorrelatedData.put(key, allData);
-                logger.info("Data for process {} is not correlated ", key);
-                continue; 
+            //     // If threshold is not met, then add to other list for scheduler to access.
+            //     nonCorrelatedData.put(key, allData);
+            //     logger.info("Data for process {} is not correlated ", key);
+            //     continue; 
 
-            }
+            // }
 
             Collections.shuffle(allData, new Random());
 

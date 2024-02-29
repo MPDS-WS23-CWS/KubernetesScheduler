@@ -7,7 +7,8 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.stereotype.Component;
-
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,14 +46,19 @@ public class SimpleProfiler {
         }
     }
 
+    @PostConstruct
+    public void init() {
+        parseFactor();
+    }
+
 
     public void parseFactor() {
 
-        Path csvPath = Paths.get(csvPath);
+        Path path = Paths.get(this.csvPath);
         
         try {
 
-            List<String> lines = Files.readAllLines(csvPath);
+            List<String> lines = Files.readAllLines(path);
 
             for (int i = 1; i < lines.size(); i++) {
 
@@ -76,16 +82,17 @@ public class SimpleProfiler {
                         // Werden bei neuem run dann overwritten
                         existingProfile.setExecTime(execTime); 
                         existingProfile.setFactor(factor); 
-                    
+                        log.info("Updated Node Profile: {} with Execution Time: {}, Factor: {}", nodeName, execTime, factor);
+                   
                     } else {
 
                         nodeProfiles.add(new NodeProfile(nodeName, execTime, factor));
-                        log.info("New Node Profile was added.");
+                        log.info("Added New Node Profile: {} with Execution Time: {}, Factor: {}", nodeName, execTime, factor);
                     }
                 }
             }
         } catch (IOException e) {
-            log.error("Error reading profiling data", e);
+            log.error("Error reading profiling data from {}", csvPath, e);
         }
     }
 
