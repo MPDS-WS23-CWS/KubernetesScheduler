@@ -25,6 +25,9 @@ import java.util.Optional;
 @Slf4j
 public class SimpleProfiler {
 
+    @Value("${profiler.csv-path}")
+    private String csvPath;
+
     @Getter
     private List<NodeProfile> nodeProfiles = new ArrayList<>();
 
@@ -43,41 +46,9 @@ public class SimpleProfiler {
     }
 
 
-    public int runProfiling() {
-
-        try {
-
-            ProcessBuilder pb = new ProcessBuilder("./kube_profiler.sh");
-            pb.directory(new File("../../../../../../../../InfraProfiler/Bash/kube_profiler.sh"));
-            pb.redirectErrorStream(true);
-            Process process = pb.start();
-
-            // Read the benchmark results
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-
-                log.info(line);
-            }
-
-            process.waitFor();
-
-            log.info("Profiling was executed successfully.");
-
-            return 1;
-
-        } catch (IOException | InterruptedException e) {
-            log.error("Error executing benchmark script", e);
-            Thread.currentThread().interrupt();
-            
-            return 0;
-        }
-    }
-
     public void parseFactor() {
 
-        Path csvPath = Paths.get("../../../../../../../../InfraProfiler/Bash/benchmark_results.csv");
+        Path csvPath = Paths.get(csvPath);
         
         try {
 
