@@ -2,3 +2,6 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant-path-matcher
+
+profiler:
+  csv-path: "/data/benchmark.csv"
