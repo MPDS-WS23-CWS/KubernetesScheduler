@@ -71,6 +71,8 @@ public class Predictor extends RegressionModelCalculator {
 
         SimpleRegression regression = fittedModels.get(processName);
 
+        // Remove exception so that scheduler knows there is no model available for this process.
+
         if (regression == null) {
             throw new IllegalArgumentException("Model for process " + processName + " not found.");
         }
