@@ -51,6 +51,10 @@ public class PrioritizeAssignScheduler extends Scheduler {
                 unscheduledTask.getTraceRecord().setSchedulerPlaceInQueue( index++ );
             }
         }
+        List<NodeWithAlloc> nodeList = new ArrayList<>(availableByNode.keySet());
+        for(Task task: unscheduledTasks){
+            task.updateRuntimePredictions(nodeList);
+        }
         prioritize.sortTasks( unscheduledTasks );
         List<NodeTaskAlignment> alignment = nodeAssigner.getTaskNodeAlignment(unscheduledTasks, availableByNode);
         long timeDelta = System.currentTimeMillis() - start;

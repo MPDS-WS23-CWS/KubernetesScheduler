@@ -28,8 +28,8 @@ public class NodeWithAlloc extends Node implements Comparable<NodeWithAlloc> {
 
     private final List<PodWithAge> startingTaskCopyingData = new LinkedList<>();
 
-    // Keeping track of the node factors
-    //private double factor;
+    @Setter
+    private float NodeRanking;
 
     public NodeWithAlloc( String name ) {
         this.kubernetesClient = null;
@@ -37,12 +37,13 @@ public class NodeWithAlloc extends Node implements Comparable<NodeWithAlloc> {
         this.assignedPods = null;
         this.setMetadata( new ObjectMeta() );
         this.getMetadata().setName( name );
+        this.NodeRanking = 1.0f;
     }
 
     public NodeWithAlloc( Node node, KubernetesClient kubernetesClient ) {
 
         this.kubernetesClient = kubernetesClient;
-
+        this.NodeRanking = 1.0f;
         this.setApiVersion( node.getApiVersion() );
         this.setKind( node.getKind() );
         this.setMetadata( node.getMetadata() );

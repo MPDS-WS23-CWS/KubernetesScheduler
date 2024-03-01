@@ -8,11 +8,8 @@ import cws.k8s.scheduler.model.SchedulerConfig;
 import cws.k8s.scheduler.model.TaskConfig;
 import cws.k8s.scheduler.scheduler.PrioritizeAssignScheduler;
 import cws.k8s.scheduler.scheduler.Scheduler;
+import cws.k8s.scheduler.scheduler.nodeassign.*;
 import cws.k8s.scheduler.scheduler.prioritize.*;
-import cws.k8s.scheduler.scheduler.nodeassign.FairAssign;
-import cws.k8s.scheduler.scheduler.nodeassign.NodeAssign;
-import cws.k8s.scheduler.scheduler.nodeassign.RandomNodeAssign;
-import cws.k8s.scheduler.scheduler.nodeassign.RoundRobinAssign;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -118,6 +115,8 @@ public class SchedulerRestController {
                         case "random": case "r": prioritize = new RandomPrioritize(); break;
                         case "max": prioritize = new MaxInputPrioritize(); break;
                         case "min": prioritize = new MinInputPrioritize(); break;
+                        case "mintime": prioritize = new MinRuntimePrioritize(); break;
+                        case "maxtime": prioritize = new MaxRuntimePrioritize(); break;
                         default:
                             return new ResponseEntity<>( "No Prioritize for: " + split[0], HttpStatus.NOT_FOUND );
                     }
@@ -126,7 +125,7 @@ public class SchedulerRestController {
                             case "random": case "r": assign = new RandomNodeAssign(); break;
                             case "roundrobin": case "rr": assign = new RoundRobinAssign(); break;
                             case "fair": case "f": assign = new FairAssign(); break;
-//                            case "time" : assign = new TimeAssign(); break;
+                            case "time" : assign = new TimeAssign(); break;
                             default:
                                 return new ResponseEntity<>( "No Assign for: " + split[1], HttpStatus.NOT_FOUND );
                         }

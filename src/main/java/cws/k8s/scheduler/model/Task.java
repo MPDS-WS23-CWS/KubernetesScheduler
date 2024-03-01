@@ -9,6 +9,10 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
@@ -34,6 +38,12 @@ public class Task {
     @Setter
     private NodeWithAlloc node = null;
 
+
+    // runtime estimates calc. through regression
+    @Getter
+    @Setter
+    private Map<NodeWithAlloc, Integer> nodeRuntimeEstimates;
+
     @Getter
     @Setter
     private Batch batch;
@@ -50,6 +60,7 @@ public class Task {
     public Task( TaskConfig config, DAG dag ) {
         this.config = config;
         this.process = dag.getByProcess( config.getTask() );
+        this.nodeRuntimeEstimates = new HashMap<>();
     }
 
     public String getWorkingDir(){
@@ -96,6 +107,36 @@ public class Task {
         }
         //return cached value
         return inputSize;
+    }
+
+    public Integer getMinNodeRuntimeEstimate() {
+        if (this.nodeRuntimeEstimates == null || this.nodeRuntimeEstimates.isEmpty()) {
+            return null;
+        } else {
+            return nodeRuntimeEstimates.values()
+                    .stream()
+                    .filter(Objects::nonNull)
+                    .min(Integer::compareTo)
+                    .orElse(null);
+        }
+    }
+
+    public void updateRuntimePredictions(List<NodeWithAlloc> nodeList){
+        //todo Call regressionmodel to get predicted runtime for top node
+        String name = this.config.getName();
+        long inputsize = this.inputSize;
+
+        Integer bestPredictedRuntime = -1;
+        clearRuntimePredictions();
+        for( NodeWithAlloc node: nodeList){
+            if (bestPredictedRuntime != null){
+            nodeRuntimeEstimates.put(node, (int)(bestPredictedRuntime * node.getNodeRanking()));
+            }
+        }
+    }
+
+    public  void clearRuntimePredictions(){
+        if (this.nodeRuntimeEstimates != null) this.nodeRuntimeEstimates.clear();
     }
 
     @Override
