@@ -83,7 +83,7 @@ public class Main {
      public void scheduledProvenanceDataFetch() {
 
         ProvenanceRestClient provClient = new ProvenanceRestClient();
-        log.info(provClient.getProvenanceData().toString());
+        //log.info(provClient.getProvenanceData().toString());
 
         // Crerate PreProcessor object to process data and fit models
         //PreProcessor preProcessor = new PreProcessor();

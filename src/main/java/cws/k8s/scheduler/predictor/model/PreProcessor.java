@@ -40,8 +40,8 @@ public class PreProcessor {
 
         Map<String, List<Tuple<Long, Integer>>> processKeyedDataSets = new HashMap<>();
 
-        // PearsonsCorrelation pearsonsCorrelation = new PearsonsCorrelation();
-        // SpearmansCorrelation spearmansCorrelation = new SpearmansCorrelation();
+        PearsonsCorrelation pearsonsCorrelation = new PearsonsCorrelation();
+        //SpearmansCorrelation spearmansCorrelation = new SpearmansCorrelation();
 
         // Process the data for each key in the Map
         for (Map.Entry<String, List<TaskProvenance>> entry : processProvenanceMap.entrySet()) {
@@ -49,6 +49,9 @@ public class PreProcessor {
             String key = entry.getKey(); // current process name
 
             List<TaskProvenance> taskProvenances = entry.getValue();
+
+            logger.debug("Processing key: {}, Number of TaskProvenances: {}", key, taskProvenances.size());
+
 
             List<Tuple<Long, Integer>> allData = new ArrayList<>();
 
@@ -63,22 +66,26 @@ public class PreProcessor {
                 long adjustedRuntime = (long) (taskProvenance.runtime / runtimeFactor);
 
                 allData.add(new Tuple<>((long) taskProvenance.inputSize, (int) adjustedRuntime));
+                logger.debug("Process: {}, Node: {}, Original Runtime: {}, Adjusted Runtime: {}, Input Size: {}",
+                 key, taskProvenance.nodeName, taskProvenance.runtime, adjustedRuntime, taskProvenance.inputSize);
             }
 
-            // double[] inputSizes = allData.stream().mapToDouble(tuple -> tuple.getInputSize()).toArray();
-            // double[] runtimes = allData.stream().mapToDouble(tuple -> tuple.getRuntime()).toArray();
-            // double pearson = pearsonsCorrelation.correlation(inputSizes, runtimes);
-            // double spearman = spearmansCorrelation.correlation(inputSizes, runtimes);
+            double[] inputSizes = allData.stream().mapToDouble(tuple -> tuple.getInputSize()).toArray();
+            double[] runtimes = allData.stream().mapToDouble(tuple -> tuple.getRuntime()).toArray();
+            double pearson = pearsonsCorrelation.correlation(inputSizes, runtimes);
+            //double spearman = spearmansCorrelation.correlation(inputSizes, runtimes);
 
 
-            // if (pearson < 0.75 || spearman < 0.75 || Double.isNaN(pearson) || Double.isNaN(spearman)) {
+            //if (pearson < 0.75 || spearman < 0.75 || Double.isNaN(pearson) || Double.isNaN(spearman)) {
+            if (pearson < 0.75 || Double.isNaN(pearson)) {        
 
-            //     // If threshold is not met, then add to other list for scheduler to access.
-            //     nonCorrelatedData.put(key, allData);
-            //     logger.info("Data for process {} is not correlated ", key);
-            //     continue; 
+                logger.info("Data for process {} is not correlated. Pearson: {}", key, pearson);
 
-            // }
+                // If threshold is not met, then add to other list for scheduler to access.
+                nonCorrelatedData.put(key, allData);
+                continue; 
+
+            }
 
             Collections.shuffle(allData, new Random());
 
