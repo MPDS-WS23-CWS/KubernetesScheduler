@@ -32,6 +32,7 @@ public class SimpleProfiler {
     @Getter
     private List<NodeProfile> nodeProfiles = new ArrayList<>();
 
+
     @Getter
     @Setter
     public static class NodeProfile {

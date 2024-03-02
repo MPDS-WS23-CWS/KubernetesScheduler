@@ -26,8 +26,8 @@ public class Main {
 
     private final BuildProperties buildProperties;
 
-    @Autowired
-    private SimpleProfiler simpleProfiler;
+//    @Autowired
+//    private SimpleProfiler simpleProfiler;
 
 
     Main( @Autowired BuildProperties buildProperties ) {
@@ -80,22 +80,19 @@ public class Main {
 
 
 
-
-
-
-     @Scheduled(fixedRate = 10000)
-     public void scheduledProvenanceDataFetch() {
-
-        ProvenanceRestClient provClient = new ProvenanceRestClient();
-        log.info(provClient.getProvenanceData().toString());
-
-        // Crerate PreProcessor object to process data and fit models
-        //PreProcessor preProcessor = new PreProcessor();
-        PreProcessor preProcessor = new PreProcessor(simpleProfiler);
-
-        preProcessor.splitData(provClient.getProvenanceData());
-
-     }
+//     @Scheduled(fixedRate = 10000)
+//     public void scheduledProvenanceDataFetch() {
+//
+//        ProvenanceRestClient provClient = new ProvenanceRestClient();
+//        log.info(provClient.getProvenanceData().toString());
+//
+//        // Create PreProcessor object to process data and fit models
+//        //PreProcessor preProcessor = new PreProcessor();
+//        PreProcessor preProcessor = new PreProcessor(simpleProfiler);
+//
+//        preProcessor.splitData(provClient.getProvenanceData());
+//
+//     }
 
     @Bean
     // avoid DataBufferLimitException for provenance storage

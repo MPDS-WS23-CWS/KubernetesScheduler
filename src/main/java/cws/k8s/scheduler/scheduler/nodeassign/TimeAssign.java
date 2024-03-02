@@ -18,9 +18,17 @@ public class TimeAssign extends NodeAssign {
         LinkedList<NodeTaskAlignment> alignment = new LinkedList<>();
         //ArrayList<Map.Entry<NodeWithAlloc, Requirements>> entries = new ArrayList<>( availableByNode.entrySet() );
         List<NodeWithAlloc> nodes = new ArrayList<>(availableByNode.keySet());
+
+        log.info("Unscheduled tasks:" + unscheduledTasks.toString());
+
         for ( final Task task : unscheduledTasks ) {
             final PodWithAge pod = task.getPod();
             log.info("Pod: " + pod.getName() + " Requested Resources: " + pod.getRequest());
+
+            log.info("task.getConfig().getTask(): " + task.getConfig().getTask());
+            log.info("task.getNodeRuntimeEstimates().toString():" + task.getNodeRuntimeEstimates().toString());
+
+
             boolean assigned = false;
             int nodesTried = 0;
 
@@ -49,9 +57,9 @@ public class TimeAssign extends NodeAssign {
 
     //Sorts nodes fast->slow for task
     public void sortNodesByRuntime(List<NodeWithAlloc> nodes, Task task){
-        Map<NodeWithAlloc, Integer> taskRuntimeEst = task.getNodeRuntimeEstimates();
-        Collections.sort(nodes, Comparator.comparingInt(node -> {
-            Integer runtime = taskRuntimeEst.get(node);
+        Map<NodeWithAlloc, Double> taskRuntimeEst = task.getNodeRuntimeEstimates();
+        Collections.sort(nodes, Comparator.comparingDouble(node -> {
+            Double runtime = taskRuntimeEst.get(node);
             return runtime != null ? runtime : Integer.MAX_VALUE;
         }));
     }

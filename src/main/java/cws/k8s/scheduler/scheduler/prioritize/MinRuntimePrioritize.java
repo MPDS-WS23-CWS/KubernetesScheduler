@@ -12,17 +12,17 @@ public class MinRuntimePrioritize implements Prioritize {
     @Override
     public void sortTasks( List<Task> tasks ) {
         tasks.sort((t1, t2) -> {
-            Integer minNodeTableEntryT1 = t1.getMinNodeRuntimeEstimate();
-            Integer minNodeTableEntryT2 = t2.getMinNodeRuntimeEstimate();
+            Double minNodeTableEntryT1 = t1.getMinNodeRuntimeEstimate();
+            Double minNodeTableEntryT2 = t2.getMinNodeRuntimeEstimate();
             return compare(minNodeTableEntryT1, minNodeTableEntryT2);
         } );
     }
 
     //Handles no estimate available, sorts to end
-    public Integer compare(Integer x, Integer y){
+    public Integer compare(Double x, Double y){
         if(x == null & y == null) return 0;
         if(x == null) return 1;
         if(y == null) return -1;
-        return Integer.compare(x,y);
+        return Double.compare(x,y);
     }
 }

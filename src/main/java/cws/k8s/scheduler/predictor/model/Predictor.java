@@ -22,12 +22,16 @@ public class Predictor extends RegressionModelCalculator {
 
     private static final Logger logger = LoggerFactory.getLogger(Predictor.class);
 
-    private Map<String, List<Tuple<Long, Integer>>> nonCorrelatedData; 
+    private Map<String, List<Tuple<Long, Integer>>> nonCorrelatedData = new HashMap<>();
 
-    public void getNonCorrelatedData(Map<String, List<Tuple<Long, Integer>>> nonCorrelatedDataMap) {
+//    public void getNonCorrelatedData(Map<String, List<Tuple<Long, Integer>>> nonCorrelatedDataMap) {
+//
+//        this.nonCorrelatedData = nonCorrelatedDataMap;
+//
+//    }
 
-        this.nonCorrelatedData = nonCorrelatedDataMap;
-
+    public void setNonCorrelatedData(Map<String, List<Tuple<Long, Integer>>> nonCorrelatedData) {
+        this.nonCorrelatedData = nonCorrelatedData;
     }
 
     // Hold models for each process in the map
@@ -53,21 +57,21 @@ public class Predictor extends RegressionModelCalculator {
     @Override
     public double predictRuntime(String processName, double inputSize) {
 
-        // Add the check if the Scheduler asks to predict a process name that is known to not correlate.
-//        if (nonCorrelatedData.containsKey(processName)) {
-//
-//            List<Tuple<Long, Integer>> tuples = nonCorrelatedData.get(processName);
-//
-//            DescriptiveStatistics stats = new DescriptiveStatistics();
-//
-//            for (Tuple<Long, Integer> tuple : tuples) {
-//
-//                stats.addValue(tuple.getRuntime());
-//            }
-//
-//            return stats.getPercentile(50);
-//
-//        }
+//         Add the check if the Scheduler asks to predict a process name that is known to not correlate.
+        if (nonCorrelatedData.containsKey(processName)) {
+
+            List<Tuple<Long, Integer>> tuples = nonCorrelatedData.get(processName);
+
+            DescriptiveStatistics stats = new DescriptiveStatistics();
+
+            for (Tuple<Long, Integer> tuple : tuples) {
+
+                stats.addValue(tuple.getRuntime());
+            }
+
+            return stats.getPercentile(50);
+
+        }
 
         SimpleRegression regression = fittedModels.get(processName);
 
