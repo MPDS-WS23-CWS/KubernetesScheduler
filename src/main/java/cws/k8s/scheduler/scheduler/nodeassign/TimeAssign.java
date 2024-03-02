@@ -26,8 +26,6 @@ public class TimeAssign extends NodeAssign {
             log.info("Pod: " + pod.getName() + " Requested Resources: " + pod.getRequest());
 
             log.info("task.getConfig().getTask(): " + task.getConfig().getTask());
-            log.info("task.getNodeRuntimeEstimates().toString():" + task.getNodeRuntimeEstimates().toString());
-
 
             boolean assigned = false;
             int nodesTried = 0;
@@ -41,6 +39,7 @@ public class TimeAssign extends NodeAssign {
                     availableByNode.get( node ).subFromThis(pod.getRequest());
                     log.info("--> " + node.getName());
                     log.info("expected runtime: " + task.getNodeRuntimeEstimates().get(node));
+                    log.info("pod: " + pod.getName());
                     assigned = true;
                     task.getTraceRecord().foundAlignment();
                     break;

@@ -153,7 +153,6 @@ public class Task {
             nodeRuntimeEstimates.put(node, (bestPredictedRuntime * nodeFactor));
         }
 
-        log.info("nodeRuntimeEstimates: " + nodeRuntimeEstimates.toString());
     }
 
     public  void clearRuntimePredictions(){

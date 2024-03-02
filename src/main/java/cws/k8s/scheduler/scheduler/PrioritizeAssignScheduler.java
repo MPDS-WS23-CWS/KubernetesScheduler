@@ -43,13 +43,13 @@ public class PrioritizeAssignScheduler extends Scheduler {
         }
     }
 
-    @Scheduled(fixedRate = 10000)
-    public void scheduledProvenanceDataFetch() {
-        Map<String, List<TaskProvenance>> provenanceData = this.provenanceRestClient.getProvenanceData();
-        log.info(provenanceData.toString());
-
-        this.preProcessor.splitData(provenanceData);
-    }
+//    @Scheduled(fixedRate = 10000)
+//    public void scheduledProvenanceDataFetch() {
+//        Map<String, List<TaskProvenance>> provenanceData = this.provenanceRestClient.getProvenanceData();
+//        log.info(provenanceData.toString());
+//
+//        this.preProcessor.splitData(provenanceData);
+//    }
 
     @Override
     public void close() {
@@ -57,6 +57,12 @@ public class PrioritizeAssignScheduler extends Scheduler {
         if ( nodeAssigner instanceof Informable ){
             client.removeInformable( (Informable) nodeAssigner );
         }
+    }
+
+    private void updateModels() {
+        Map<String, List<TaskProvenance>> provenanceData = this.provenanceRestClient.getProvenanceData();
+        log.info(provenanceData.toString());
+        this.preProcessor.splitData(provenanceData);
     }
 
     @Override
@@ -72,6 +78,9 @@ public class PrioritizeAssignScheduler extends Scheduler {
             }
         }
         List<NodeWithAlloc> nodeList = new ArrayList<>(availableByNode.keySet());
+
+        updateModels();
+
         for(Task task: unscheduledTasks){
             task.updateRuntimePredictions(preProcessor, profiler, nodeList);
         }

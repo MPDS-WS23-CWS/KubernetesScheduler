@@ -56,7 +56,7 @@ public class PreProcessor {
 
             List<TaskProvenance> taskProvenances = entry.getValue();
 
-            logger.debug("Processing key: {}, Number of TaskProvenances: {}", key, taskProvenances.size());
+            logger.info("Processing key: {}, Number of TaskProvenances: {}", key, taskProvenances.size());
 
 
             List<Tuple<Long, Integer>> allData = new ArrayList<>();
@@ -72,7 +72,7 @@ public class PreProcessor {
                 long adjustedRuntime = (long) (taskProvenance.runtime / runtimeFactor);
 
                 allData.add(new Tuple<>((long) taskProvenance.inputSize, (int) adjustedRuntime));
-                logger.debug("Process: {}, Node: {}, Original Runtime: {}, Adjusted Runtime: {}, Input Size: {}",
+                logger.info("Process: {}, Node: {}, Original Runtime: {}, Adjusted Runtime: {}, Input Size: {}",
                         key, taskProvenance.nodeName, taskProvenance.runtime, adjustedRuntime, taskProvenance.inputSize);
             }
 
