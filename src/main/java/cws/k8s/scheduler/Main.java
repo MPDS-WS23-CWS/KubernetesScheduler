@@ -74,7 +74,7 @@ public class Main {
         info += "=".repeat( longest + 6 ) + "\n";
 
         log.info( "\n\n\n" + info + "\n" );
-
+//        new SimpleProfiler();
     }
 
 

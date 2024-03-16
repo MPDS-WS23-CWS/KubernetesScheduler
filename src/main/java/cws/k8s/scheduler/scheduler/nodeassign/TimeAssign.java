@@ -19,13 +19,13 @@ public class TimeAssign extends NodeAssign {
         //ArrayList<Map.Entry<NodeWithAlloc, Requirements>> entries = new ArrayList<>( availableByNode.entrySet() );
         List<NodeWithAlloc> nodes = new ArrayList<>(availableByNode.keySet());
 
-        log.info("Unscheduled tasks:" + unscheduledTasks.toString());
+//        log.info("Unscheduled tasks:" + unscheduledTasks.toString());
 
         for ( final Task task : unscheduledTasks ) {
             final PodWithAge pod = task.getPod();
             log.info("Pod: " + pod.getName() + " Requested Resources: " + pod.getRequest());
 
-            log.info("task.getConfig().getTask(): " + task.getConfig().getTask());
+//            log.info("task.getConfig().getTask(): " + task.getConfig().getTask());
 
             boolean assigned = false;
             int nodesTried = 0;
@@ -38,8 +38,8 @@ public class TimeAssign extends NodeAssign {
                     alignment.add(new NodeTaskAlignment( node, task));
                     availableByNode.get( node ).subFromThis(pod.getRequest());
                     log.info("--> " + node.getName());
-                    log.info("expected runtime: " + task.getNodeRuntimeEstimates().get(node));
-                    log.info("pod: " + pod.getName());
+//                    log.info("Expected runtime: " + task.getNodeRuntimeEstimates().get(node));
+//                    log.info("pod: " + pod.getName());
                     assigned = true;
                     task.getTraceRecord().foundAlignment();
                     break;

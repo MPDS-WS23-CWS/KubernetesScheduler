@@ -26,11 +26,15 @@ import java.util.Optional;
 @Slf4j
 public class SimpleProfiler {
 
-    @Value("${profiler.csv-path}")
-    private String csvPath;
+//    @Value("${profiler.csv-path}")
+    private String csvPath = "/data/benchmark.csv";
 
     @Getter
     private List<NodeProfile> nodeProfiles = new ArrayList<>();
+
+    public SimpleProfiler() {
+        parseFactor();
+    }
 
 
     @Getter
@@ -45,12 +49,16 @@ public class SimpleProfiler {
             this.execTime = execTime;
             this.factor = factor;
         }
+
+        public String toString() {
+            return "{nodeName: " + getNodeName() + ", factor: " + getFactor() + "}";
+        }
     }
 
-    @PostConstruct
-    public void init() {
-        parseFactor();
-    }
+//    @PostConstruct
+//    public void init() {
+//        parseFactor();
+//    }
 
 
     public void parseFactor() {
@@ -72,7 +80,7 @@ public class SimpleProfiler {
                     double factor = Double.parseDouble(parts[2].trim());
 
                     // Update or add NodeProfile for the nodeName
-                    Optional<NodeProfile> existingProfileOpt = nodeProfiles.stream()
+                    Optional<NodeProfile> existingProfileOpt = this.nodeProfiles.stream()
                             .filter(profile -> profile.getNodeName().equals(nodeName))
                             .findFirst();
 
@@ -83,12 +91,13 @@ public class SimpleProfiler {
                         // Werden bei neuem run dann overwritten
                         existingProfile.setExecTime(execTime); 
                         existingProfile.setFactor(factor); 
-                        log.info("Updated Node Profile: {} with Execution Time: {}, Factor: {}", nodeName, execTime, factor);
+                        log.info("Updated Node Profile: {} with Factor: {}", nodeName, factor);
 
                     } else {
 
-                        nodeProfiles.add(new NodeProfile(nodeName, execTime, factor));
-                        log.info("Added New Node Profile: {} with Execution Time: {}, Factor: {}", nodeName, execTime, factor);
+                        this.nodeProfiles.add(new NodeProfile(nodeName, execTime, factor));
+                        log.info("Added New Node Profile: {} with Factor: {}", nodeName,  factor);
+                        log.info(getNodeProfiles().toString());
                     }
                 }
             }

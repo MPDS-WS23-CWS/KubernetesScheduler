@@ -36,6 +36,7 @@ public class PrioritizeAssignScheduler extends Scheduler {
         this.nodeAssigner = nodeAssigner;
         this.profiler = new SimpleProfiler();
         this.preProcessor = new PreProcessor(this.profiler);
+        log.info("Scheduler: " + this.profiler.getNodeProfiles().toString());
         this.provenanceRestClient = new ProvenanceRestClient();
         nodeAssigner.registerScheduler( this );
         if ( nodeAssigner instanceof Informable ){
@@ -61,7 +62,7 @@ public class PrioritizeAssignScheduler extends Scheduler {
 
     private void updateModels() {
         Map<String, List<TaskProvenance>> provenanceData = this.provenanceRestClient.getProvenanceData();
-        log.info(provenanceData.toString());
+//        log.info(provenanceData.toString());
         this.preProcessor.splitData(provenanceData);
     }
 

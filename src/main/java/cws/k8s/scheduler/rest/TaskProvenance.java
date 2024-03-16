@@ -14,6 +14,9 @@ public class TaskProvenance {
 
     public int runtime;
 
+    // runtime adjusted for the node the pod was run on
+    public int adjustedRuntime = -1;
+
     public long inputSize;
 
 

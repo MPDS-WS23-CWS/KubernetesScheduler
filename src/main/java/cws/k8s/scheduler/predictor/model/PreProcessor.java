@@ -40,9 +40,35 @@ public class PreProcessor {
 
     public Map<String, List<Tuple<Long, Integer>>> nonCorrelatedData = new HashMap<>();
 
+    private void computeAdjustedRuntimes(Map<String, List<TaskProvenance>> processProvenanceMap) {
+        for (Map.Entry<String, List<TaskProvenance>> entry : processProvenanceMap.entrySet()) {
+            String processName = entry.getKey();
+            List<TaskProvenance> taskProvenances = entry.getValue();
+
+            logger.info("Processing provenance data: {}, Number of data points: {}", processName, taskProvenances.size());
+
+            logger.info("Node profiles: " + simpleProfiler.getNodeProfiles().toString());
+
+            for (TaskProvenance taskProvenance : taskProvenances) {
+                logger.info(taskProvenance.nodeName);
+                double runtimeFactor = simpleProfiler.getNodeProfiles().stream()
+                        .filter(profile -> profile.getNodeName().equals(taskProvenance.nodeName))
+                        .findFirst()
+                        .map(NodeProfile::getFactor)
+                        .orElse(1.0);
+
+                int adjustedRuntime = (int) (taskProvenance.runtime / runtimeFactor);
+                taskProvenance.setAdjustedRuntime(adjustedRuntime);
+
+                logger.info("Process: {}, Node: {}, Original Runtime: {}, Adjusted Runtime: {}, Input Size: {}",
+                        processName, taskProvenance.nodeName, taskProvenance.runtime, adjustedRuntime, taskProvenance.inputSize);
+            }
+        }
+    }
 
 
     public void splitData(Map<String, List<TaskProvenance>> processProvenanceMap) {
+        computeAdjustedRuntimes(processProvenanceMap);
 
         Map<String, List<Tuple<Long, Integer>>> processKeyedDataSets = new HashMap<>();
 
@@ -56,7 +82,7 @@ public class PreProcessor {
 
             List<TaskProvenance> taskProvenances = entry.getValue();
 
-            logger.info("Processing key: {}, Number of TaskProvenances: {}", key, taskProvenances.size());
+            logger.info("Processing provenance data: {}, Number of data points: {}", key, taskProvenances.size());
 
 
             List<Tuple<Long, Integer>> allData = new ArrayList<>();
@@ -72,8 +98,8 @@ public class PreProcessor {
                 long adjustedRuntime = (long) (taskProvenance.runtime / runtimeFactor);
 
                 allData.add(new Tuple<>((long) taskProvenance.inputSize, (int) adjustedRuntime));
-                logger.info("Process: {}, Node: {}, Original Runtime: {}, Adjusted Runtime: {}, Input Size: {}",
-                        key, taskProvenance.nodeName, taskProvenance.runtime, adjustedRuntime, taskProvenance.inputSize);
+//                logger.info("Process: {}, Node: {}, Original Runtime: {}, Adjusted Runtime: {}, Input Size: {}",
+//                        key, taskProvenance.nodeName, taskProvenance.runtime, adjustedRuntime, taskProvenance.inputSize);
             }
 
             double[] inputSizes = allData.stream().mapToDouble(tuple -> tuple.getInputSize()).toArray();

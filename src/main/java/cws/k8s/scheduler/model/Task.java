@@ -129,8 +129,8 @@ public class Task {
         processName = processName.replaceAll(":", "_");
         long inputSize = getInputSize();
 
-        log.info("processName: " + processName);
-        log.info("inputsize: " + inputSize);
+        log.info("Task with process name: " + processName);
+        log.info("Input size: " + inputSize);
 
         //        Integer bestPredictedRuntime = -1;
         clearRuntimePredictions();
@@ -142,7 +142,7 @@ public class Task {
             bestPredictedRuntime = Integer.MAX_VALUE;
         }
 
-        log.info("bestPredictedRuntime: " + bestPredictedRuntime);
+        log.info("Predicted runtime (best node): " + bestPredictedRuntime);
 
         for( NodeWithAlloc node: nodeList){
             double nodeFactor = profiler.getNodeProfiles().stream()
