@@ -12,12 +12,12 @@ public class TaskProvenance {
 
     public String nodeName;
 
+    public long inputSize;
+
     public int runtime;
 
-    // runtime adjusted for the node the pod was run on
-    public int adjustedRuntime = -1;
-
-    public long inputSize;
+    // runtime adjusted for the node the pod was run on using benchmarking results
+    public double adjustedRuntime = -1;
 
 
     public TaskProvenance(String podId, String processName, String nodeName, int runtime, long inputSize) {

@@ -3,9 +3,7 @@ package cws.k8s.scheduler.model;
 import cws.k8s.scheduler.dag.DAG;
 import cws.k8s.scheduler.dag.Process;
 import cws.k8s.scheduler.model.tracing.TraceRecord;
-import cws.k8s.scheduler.predictor.domain.SimpleProfiler;
-import cws.k8s.scheduler.predictor.model.PreProcessor;
-import cws.k8s.scheduler.predictor.model.Predictor;
+import cws.k8s.scheduler.predictor.model.RuntimePredictor;
 import cws.k8s.scheduler.util.Batch;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -42,10 +39,11 @@ public class Task {
     private NodeWithAlloc node = null;
 
 
-    // runtime estimates calc. through regression
     @Getter
     @Setter
-    private Map<NodeWithAlloc, Double> nodeRuntimeEstimates;
+    // maps node name to runtime estimate (in seconds)
+    private Map<String, Double> nodeRuntimeEstimates;
+//    private Map<NodeWithAlloc, Double> nodeRuntimeEstimates;
 
     @Getter
     @Setter
@@ -124,38 +122,22 @@ public class Task {
         }
     }
 
-    public void updateRuntimePredictions(PreProcessor preProcessor, SimpleProfiler profiler, List<NodeWithAlloc> nodeList){
+    public void updateRuntimePredictions(RuntimePredictor runtimePredictor){
         String processName = this.config.getTask();
         processName = processName.replaceAll(":", "_");
         long inputSize = getInputSize();
 
-        log.info("Task with process name: " + processName);
+        log.info("Updating runtime predictions for process " + processName);
         log.info("Input size: " + inputSize);
 
-        //        Integer bestPredictedRuntime = -1;
         clearRuntimePredictions();
-        // node with factor 1.0
-        double bestPredictedRuntime;
-        try {
-            bestPredictedRuntime = preProcessor.predictRuntime(processName, inputSize);
-        } catch(IllegalArgumentException e) {
-            bestPredictedRuntime = Integer.MAX_VALUE;
-        }
 
-        log.info("Predicted runtime (best node): " + bestPredictedRuntime);
-
-        for( NodeWithAlloc node: nodeList){
-            double nodeFactor = profiler.getNodeProfiles().stream()
-                    .filter(profile -> profile.getNodeName().equals(node.getName()))
-                    .findFirst()
-                    .map(SimpleProfiler.NodeProfile::getFactor)
-                    .orElse(1.0);
-            nodeRuntimeEstimates.put(node, (bestPredictedRuntime * nodeFactor));
-        }
-
+        Map<String, Double> predictionsPerNode = runtimePredictor.predict(processName, inputSize);
+        log.info("Predicted runtimes: " + predictionsPerNode);
+        this.nodeRuntimeEstimates.putAll(predictionsPerNode);
     }
 
-    public  void clearRuntimePredictions(){
+    public void clearRuntimePredictions(){
         if (this.nodeRuntimeEstimates != null) this.nodeRuntimeEstimates.clear();
     }
 

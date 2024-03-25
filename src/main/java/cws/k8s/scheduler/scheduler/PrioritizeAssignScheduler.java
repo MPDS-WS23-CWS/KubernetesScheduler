@@ -1,28 +1,27 @@
 package cws.k8s.scheduler.scheduler;
 
-import cws.k8s.scheduler.model.*;
-import cws.k8s.scheduler.predictor.domain.SimpleProfiler;
-import cws.k8s.scheduler.predictor.model.PreProcessor;
-import cws.k8s.scheduler.predictor.model.Predictor;
-import cws.k8s.scheduler.rest.ProvenanceRestClient;
-import cws.k8s.scheduler.rest.TaskProvenance;
-import cws.k8s.scheduler.scheduler.prioritize.Prioritize;
 import cws.k8s.scheduler.client.Informable;
 import cws.k8s.scheduler.client.KubernetesClient;
+import cws.k8s.scheduler.model.*;
+import cws.k8s.scheduler.predictor.domain.NodeProfiler;
+import cws.k8s.scheduler.predictor.model.RuntimePredictor;
+import cws.k8s.scheduler.rest.ProvenanceRestClient;
+import cws.k8s.scheduler.rest.TaskProvenance;
 import cws.k8s.scheduler.scheduler.nodeassign.NodeAssign;
+import cws.k8s.scheduler.scheduler.prioritize.Prioritize;
 import cws.k8s.scheduler.util.NodeTaskAlignment;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public class PrioritizeAssignScheduler extends Scheduler {
 
     private final Prioritize prioritize;
     private final NodeAssign nodeAssigner;
-    private final PreProcessor preProcessor;
-    private final SimpleProfiler profiler;
+    private final RuntimePredictor runtimePredictor;
+    private final NodeProfiler profiler;
     private final ProvenanceRestClient provenanceRestClient;
 
     public PrioritizeAssignScheduler( String execution,
@@ -34,23 +33,14 @@ public class PrioritizeAssignScheduler extends Scheduler {
         super(execution, client, namespace, config);
         this.prioritize = prioritize;
         this.nodeAssigner = nodeAssigner;
-        this.profiler = new SimpleProfiler();
-        this.preProcessor = new PreProcessor(this.profiler);
-        log.info("Scheduler: " + this.profiler.getNodeProfiles().toString());
+        this.profiler = new NodeProfiler();
+        this.runtimePredictor = new RuntimePredictor(this.profiler);
         this.provenanceRestClient = new ProvenanceRestClient();
         nodeAssigner.registerScheduler( this );
         if ( nodeAssigner instanceof Informable ){
             client.addInformable( (Informable) nodeAssigner );
         }
     }
-
-//    @Scheduled(fixedRate = 10000)
-//    public void scheduledProvenanceDataFetch() {
-//        Map<String, List<TaskProvenance>> provenanceData = this.provenanceRestClient.getProvenanceData();
-//        log.info(provenanceData.toString());
-//
-//        this.preProcessor.splitData(provenanceData);
-//    }
 
     @Override
     public void close() {
@@ -62,8 +52,7 @@ public class PrioritizeAssignScheduler extends Scheduler {
 
     private void updateModels() {
         Map<String, List<TaskProvenance>> provenanceData = this.provenanceRestClient.getProvenanceData();
-//        log.info(provenanceData.toString());
-        this.preProcessor.splitData(provenanceData);
+        this.runtimePredictor.train(provenanceData);
     }
 
     @Override
@@ -78,13 +67,13 @@ public class PrioritizeAssignScheduler extends Scheduler {
                 unscheduledTask.getTraceRecord().setSchedulerPlaceInQueue( index++ );
             }
         }
-        List<NodeWithAlloc> nodeList = new ArrayList<>(availableByNode.keySet());
-
         updateModels();
 
+//        List<NodeWithAlloc> nodeList = new ArrayList<>(availableByNode.keySet());
         for(Task task: unscheduledTasks){
-            task.updateRuntimePredictions(preProcessor, profiler, nodeList);
+            task.updateRuntimePredictions(runtimePredictor);
         }
+
         prioritize.sortTasks( unscheduledTasks );
         List<NodeTaskAlignment> alignment = nodeAssigner.getTaskNodeAlignment(unscheduledTasks, availableByNode);
         long timeDelta = System.currentTimeMillis() - start;

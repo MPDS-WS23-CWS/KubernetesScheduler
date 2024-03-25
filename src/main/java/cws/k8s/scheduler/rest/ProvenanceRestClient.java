@@ -1,5 +1,6 @@
 package cws.k8s.scheduler.rest;
 
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -7,6 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class ProvenanceRestClient {
     private final WebClient webClient;
     String provenanceDbApiUrl = System.getenv("PROVENANCE_DB_API_URL");
@@ -41,6 +43,7 @@ public class ProvenanceRestClient {
                 processProvenanceMap.get(processName).add(taskProvenance);
             }
         }
+        log.info("Fetched provenance data of {} tasks", processProvenanceMap.size());
         return processProvenanceMap;
     }
 

@@ -56,9 +56,9 @@ public class TimeAssign extends NodeAssign {
 
     //Sorts nodes fast->slow for task
     public void sortNodesByRuntime(List<NodeWithAlloc> nodes, Task task){
-        Map<NodeWithAlloc, Double> taskRuntimeEst = task.getNodeRuntimeEstimates();
-        Collections.sort(nodes, Comparator.comparingDouble(node -> {
-            Double runtime = taskRuntimeEst.get(node);
+        Map<String, Double> taskRuntimeEst = task.getNodeRuntimeEstimates();
+        nodes.sort(Comparator.comparingDouble(node -> {
+            Double runtime = taskRuntimeEst.get(node.getName());
             return runtime != null ? runtime : Integer.MAX_VALUE;
         }));
     }

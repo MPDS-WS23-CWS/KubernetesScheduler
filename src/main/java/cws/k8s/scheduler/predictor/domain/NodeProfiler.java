@@ -1,30 +1,22 @@
 package cws.k8s.scheduler.predictor.domain;
 
-import cws.k8s.scheduler.model.NodeWithAlloc;
-import cws.k8s.scheduler.model.Task;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import org.springframework.stereotype.Component;
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Value;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 
 @Component
 @Slf4j
-public class SimpleProfiler {
+public class NodeProfiler {
 
 //    @Value("${profiler.csv-path}")
     private String csvPath = "/data/benchmark.csv";
@@ -32,7 +24,7 @@ public class SimpleProfiler {
     @Getter
     private List<NodeProfile> nodeProfiles = new ArrayList<>();
 
-    public SimpleProfiler() {
+    public NodeProfiler() {
         parseFactor();
     }
 
@@ -54,11 +46,6 @@ public class SimpleProfiler {
             return "{nodeName: " + getNodeName() + ", factor: " + getFactor() + "}";
         }
     }
-
-//    @PostConstruct
-//    public void init() {
-//        parseFactor();
-//    }
 
 
     public void parseFactor() {
@@ -91,13 +78,12 @@ public class SimpleProfiler {
                         // Werden bei neuem run dann overwritten
                         existingProfile.setExecTime(execTime); 
                         existingProfile.setFactor(factor); 
-                        log.info("Updated Node Profile: {} with Factor: {}", nodeName, factor);
+                        log.info("Updated node profile: {} with factor: {}", nodeName, factor);
 
                     } else {
 
                         this.nodeProfiles.add(new NodeProfile(nodeName, execTime, factor));
-                        log.info("Added New Node Profile: {} with Factor: {}", nodeName,  factor);
-                        log.info(getNodeProfiles().toString());
+                        log.info("Added new node profile: {} with factor: {}", nodeName,  factor);
                     }
                 }
             }
