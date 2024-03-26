@@ -48,10 +48,10 @@ class RankPrioritizeTest {
 //        test1.add(n2);
 //        test1.add(n3);
 //
-//        Map<NodeWithAlloc, Integer> testmap = new HashMap<>();
-//        testmap.put(n1,10);
-//        testmap.put(n2,null);
-//        testmap.put(n3,1);
+//        Map<String, Double> testmap = new HashMap<>();
+//        testmap.put(n1.getName(),null);
+//        testmap.put(n2.getName(),null);
+//        testmap.put(n3.getName(),null);
 //
 //        /*
 //        for(NodeWithAlloc node:test1){
@@ -64,20 +64,21 @@ class RankPrioritizeTest {
 //            System.out.println(node.getName());
 //        }
 //        */
-//        Map<NodeWithAlloc, Integer> testmap2 = new HashMap<>();
+//        Map<String, Double> testmap2 = new HashMap<>();
 //        testmap2.put(null, null);
-//        testmap2.put(n2,2);
+//        testmap2.put(n2.getName(),300.0);
 //
-//        Map<NodeWithAlloc, Integer> testmap3 = new HashMap<>();
-//        testmap3.put(n1,5);
-//        testmap3.put(n2,200);
+//        Map<String, Double> testmap3 = new HashMap<>();
+//        testmap3.put(n1.getName(),5.0);
+//        testmap3.put(n2.getName(),200.0);
 //
 //
 //        b1.setNodeRuntimeEstimates(testmap2);
 //        a1.setNodeRuntimeEstimates(testmap3);
+//
 //        System.out.println("minruntime:" + b1.getMinNodeRuntimeEstimate());
 //        final List<Task> tasks = Arrays.asList( c1, b1, a1);
-//        new MinRuntimePrioritize().sortTasks( tasks );
+//        new MaxRuntimePrioritize().sortTasks( tasks );
 //        for(Task task :tasks){
 //            System.out.println(task.getNodeRuntimeEstimates().values());
 //        }
@@ -87,11 +88,11 @@ class RankPrioritizeTest {
 //        assertEquals( Arrays.asList( a1, a2, b1, b2, c1, c2 ), tasks2 );
 //
 //    }
-
+//
 //    public void sortNodesByRuntime(List<NodeWithAlloc> nodes, Task task){
-//        Map<NodeWithAlloc, Integer> taskRuntimeEst = task.getNodeRuntimeEstimates();
-//        Collections.sort(nodes, Comparator.comparingInt(node -> {
-//            Integer runtime = taskRuntimeEst.get(node);
+//        Map<String, Double> taskRuntimeEst = task.getNodeRuntimeEstimates();
+//        nodes.sort(Comparator.comparingDouble(node -> {
+//            Double runtime = taskRuntimeEst.get(node.getName());
 //            return runtime != null ? runtime : Integer.MAX_VALUE;
 //        }));
 //    }

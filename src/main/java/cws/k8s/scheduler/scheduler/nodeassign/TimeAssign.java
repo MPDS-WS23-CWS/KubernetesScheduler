@@ -12,11 +12,10 @@ import java.util.*;
 @Slf4j
 public class TimeAssign extends NodeAssign {
     @Override
-    //Assumes tasklist is sorted by estimated runtimes, schedules tasks on highest performing nodes
+    //Assumes tasks have predicted runtime and schedules tasks on highest performing nodes
     public List<NodeTaskAlignment> getTaskNodeAlignment(List<Task> unscheduledTasks, Map<NodeWithAlloc, Requirements> availableByNode
     ){
         LinkedList<NodeTaskAlignment> alignment = new LinkedList<>();
-        //ArrayList<Map.Entry<NodeWithAlloc, Requirements>> entries = new ArrayList<>( availableByNode.entrySet() );
         List<NodeWithAlloc> nodes = new ArrayList<>(availableByNode.keySet());
 
 //        log.info("Unscheduled tasks:" + unscheduledTasks.toString());
@@ -30,6 +29,7 @@ public class TimeAssign extends NodeAssign {
             boolean assigned = false;
             int nodesTried = 0;
 
+            //Sort nodes by best runtime for task
             sortNodesByRuntime(nodes, task);
 
             for ( NodeWithAlloc node : nodes) {
