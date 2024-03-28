@@ -67,6 +67,8 @@ public class PrioritizeAssignScheduler extends Scheduler {
                 unscheduledTask.getTraceRecord().setSchedulerPlaceInQueue( index++ );
             }
         }
+        log.info("getting TaskNodeAlignment");
+        log.info("updating models");
         updateModels();
 
 //        List<NodeWithAlloc> nodeList = new ArrayList<>(availableByNode.keySet());

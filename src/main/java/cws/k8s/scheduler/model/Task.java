@@ -124,14 +124,12 @@ public class Task {
 
     public void updateRuntimePredictions(RuntimePredictor runtimePredictor){
         String processName = this.config.getTask();
+        // in Prometheus process name labels, ':' are replaced by '_'
         processName = processName.replaceAll(":", "_");
         long inputSize = getInputSize();
 
-        log.info("Updating runtime predictions for process " + processName);
-        log.info("Input size: " + inputSize);
-
+        log.info("Predict runtime for process {} with input size {}", processName, inputSize);
         clearRuntimePredictions();
-
         Map<String, Double> predictionsPerNode = runtimePredictor.predict(processName, inputSize);
         log.info("Predicted runtimes: " + predictionsPerNode);
         this.nodeRuntimeEstimates.putAll(predictionsPerNode);

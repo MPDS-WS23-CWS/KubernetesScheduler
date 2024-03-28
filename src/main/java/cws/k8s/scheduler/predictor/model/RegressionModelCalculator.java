@@ -1,13 +1,9 @@
 package cws.k8s.scheduler.predictor.model;
 
-import cws.k8s.scheduler.predictor.model.Tuple;
-
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 import cws.k8s.scheduler.rest.TaskProvenance;
-import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 public abstract class RegressionModelCalculator {
 

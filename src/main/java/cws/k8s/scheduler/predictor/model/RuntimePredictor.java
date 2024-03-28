@@ -23,7 +23,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RuntimePredictor extends RegressionModelCalculator {
-    // Use the profiler object to access factors
+    // Use the profiler object to access node factors
     private NodeProfiler nodeProfiler;
 
     private Map<String, List<TaskProvenance>> processProvenanceMap;
@@ -36,7 +36,7 @@ public class RuntimePredictor extends RegressionModelCalculator {
 
     public void train(Map<String, List<TaskProvenance>> processProvenanceMap) {
         setProcessProvenanceMap(processProvenanceMap);
-        setAdjustedRuntimes();
+        computeAdjustedRuntimes();
 
         for (Map.Entry<String, List<TaskProvenance>> entry : getProcessProvenanceMap().entrySet()) {
             String processName = entry.getKey();
@@ -52,12 +52,17 @@ public class RuntimePredictor extends RegressionModelCalculator {
     }
 
     public Map<String, Double> predict(String processName, double inputSize) {
+        log.info("Requested prediction for " + processName);
+        log.info("runtimeMedians: " + runtimeMedians);
+        log.info("runtimeRegressionModels: " + runtimeRegressionModels.keySet());
+
         List<NodeProfile> nodeProfiles = nodeProfiler.getNodeProfiles();
         Map<String, Double> predictionsPerNode = new HashMap<>();
         double predictionBestNode;
 
         // uncorrelated
         if (runtimeMedians.containsKey(processName)) {
+            log.info("Found median");
             predictionBestNode = runtimeMedians.get(processName);
             for (NodeProfile nodeProfile : nodeProfiles) {
                 predictionsPerNode.put(nodeProfile.getNodeName(), nodeProfile.getFactor() * predictionBestNode);
@@ -65,6 +70,7 @@ public class RuntimePredictor extends RegressionModelCalculator {
         }
         // correlated
         else if (runtimeRegressionModels.containsKey(processName)){
+            log.info("Found regression model");
             SimpleRegression regressionModel = runtimeRegressionModels.get(processName);
             predictionBestNode = regressionModel.predict(inputSize);
             for (NodeProfile nodeProfile : nodeProfiles) {
@@ -74,19 +80,20 @@ public class RuntimePredictor extends RegressionModelCalculator {
         // unknown nextflow process
         else {
             for (NodeProfile nodeProfile : nodeProfiles) {
-                predictionsPerNode.put(nodeProfile.getNodeName(), (double) Integer.MAX_VALUE);
+                predictionsPerNode.put(nodeProfile.getNodeName(), null);
+//                  predictionsPerNode.put(nodeProfile.getNodeName(), (double) Integer.MAX_VALUE);
             }
             log.warn("Runtime model for process " + processName + " not found.");
         }
         return predictionsPerNode;
     }
 
-    private void setAdjustedRuntimes() {
+    private void computeAdjustedRuntimes() {
         for (Map.Entry<String, List<TaskProvenance>> entry : getProcessProvenanceMap().entrySet()) {
             String processName = entry.getKey();
             List<TaskProvenance> taskProvenances = entry.getValue();
 
-            log.info("Computing adjusted runtimes for {} (number of data points: {})", processName, taskProvenances.size());
+            log.info("Computing adjusted runtimes for {} (data points: {})", processName, taskProvenances.size());
 //            log.info("Node profiles: " + nodeProfiler.getNodeProfiles().toString());
 
             for (TaskProvenance taskProvenance : taskProvenances) {
@@ -99,7 +106,7 @@ public class RuntimePredictor extends RegressionModelCalculator {
                 double adjustedRuntime = (taskProvenance.runtime / runtimeFactor);
                 taskProvenance.setAdjustedRuntime(adjustedRuntime);
 
-                log.info("Set adjusted runtime - Process: {}, Node: {}, Original Runtime: {}, Adjusted Runtime: {}, Input Size: {}",
+                log.debug("Set adjusted runtime; Process: {}, Node: {}, Original Runtime: {}, Adjusted Runtime: {}, Input Size: {}",
                         processName, taskProvenance.nodeName, taskProvenance.runtime, adjustedRuntime, taskProvenance.inputSize);
             }
         }
@@ -116,10 +123,10 @@ public class RuntimePredictor extends RegressionModelCalculator {
 
             //if (pearson < 0.75 || spearman < 0.75 || Double.isNaN(pearson) || Double.isNaN(spearman)) {
             if (pearson < 0.5 || Double.isNaN(pearson)) {
-                log.info("Data for process {} is not correlated. Pearson {}", processName, pearson);
+                log.info("Data for process {} is not correlated: Pearson {}", processName, pearson);
                 return false;
             } else {
-                log.info("Data for process {} is correlated. Pearson {}", processName, pearson);
+                log.info("Data for process {} is correlated: Pearson {}", processName, pearson);
                 return true;
             }
         } catch (MathIllegalArgumentException e) {
@@ -129,8 +136,11 @@ public class RuntimePredictor extends RegressionModelCalculator {
     }
     
     private List<Tuple<Long, Double>> getTrainingData (List<TaskProvenance> taskProvenances) {
-        List<Tuple<Long, Double>> tuples = new ArrayList<>(taskProvenances.stream().map(t ->
-                new Tuple<>(t.getInputSize(), t.getAdjustedRuntime())).toList());
+        List<Tuple<Long, Double>> tuples = new ArrayList<>(
+                taskProvenances
+                .stream()
+                .map(t -> new Tuple<>(t.getInputSize(), t.getAdjustedRuntime()))
+                .toList());
         Collections.shuffle(tuples, new Random());
         // TODO check data split
         int splitIndex = (int) (tuples.size() * 0.8);
@@ -144,7 +154,7 @@ public class RuntimePredictor extends RegressionModelCalculator {
             regression.addData(tuple.inputSize, tuple.runtime);
         }
         runtimeRegressionModels.put(processName, regression);
-        log.info("Regression model fitted for process: {}", processName);
+        log.info("Regression model fitted for process {}", processName);
     }
     
     private void putRuntimeMedian(String processName, List<TaskProvenance> taskProvenances) {
@@ -155,6 +165,6 @@ public class RuntimePredictor extends RegressionModelCalculator {
         }
         double median = stats.getPercentile(50);
         runtimeMedians.put(processName, median);
-        log.info("Runtime median {} computed for process: {}", median, processName);
+        log.info("Runtime median {} computed for process {}", median, processName);
     }
 }

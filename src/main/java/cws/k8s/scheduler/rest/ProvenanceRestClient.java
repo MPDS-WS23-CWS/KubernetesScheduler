@@ -43,7 +43,7 @@ public class ProvenanceRestClient {
                 processProvenanceMap.get(processName).add(taskProvenance);
             }
         }
-        log.info("Fetched provenance data of {} tasks", processProvenanceMap.size());
+        log.info("Fetched provenance data of {} processes", processProvenanceMap.size());
         return processProvenanceMap;
     }
 
