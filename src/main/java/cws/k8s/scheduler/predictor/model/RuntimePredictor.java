@@ -13,6 +13,7 @@ import java.util.Collections;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.exception.MathIllegalArgumentException;
+import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
@@ -22,6 +23,7 @@ import lombok.Setter;
 @Slf4j
 @Getter
 @Setter
+
 public class RuntimePredictor extends RegressionModelCalculator {
     // Use the profiler object to access factors
     private NodeProfiler nodeProfiler;
@@ -29,6 +31,7 @@ public class RuntimePredictor extends RegressionModelCalculator {
     private Map<String, List<TaskProvenance>> processProvenanceMap;
     private Map<String, Double> runtimeMedians = new HashMap<>();
     private Map<String, SimpleRegression> runtimeRegressionModels = new HashMap<>();
+
 
     public RuntimePredictor(NodeProfiler nodeProfiler) {
         this.nodeProfiler = nodeProfiler;
@@ -43,8 +46,11 @@ public class RuntimePredictor extends RegressionModelCalculator {
             List<TaskProvenance> taskProvenances = entry.getValue();
 
             if (isCorrelated(taskProvenances)) {
-                List<Tuple<Long, Double>> trainingData = getTrainingData(taskProvenances);
+                Map<String, List<Tuple<Long, Double>>> splitData = getTrainingAndTestData(taskProvenances);
+                List<Tuple<Long, Double>> trainingData = splitData.get("trainingData");
+                List<Tuple<Long, Double>> testData = splitData.get("testData");
                 putRegressionModel(processName, trainingData);
+                calculateAccuracyOfModel(processName, testData);
             } else {
                 putRuntimeMedian(processName, taskProvenances);
             }
@@ -64,7 +70,7 @@ public class RuntimePredictor extends RegressionModelCalculator {
             }
         }
         // correlated
-        else if (runtimeRegressionModels.containsKey(processName)){
+        else if (runtimeRegressionModels.containsKey(processName)) {
             SimpleRegression regressionModel = runtimeRegressionModels.get(processName);
             predictionBestNode = regressionModel.predict(inputSize);
             for (NodeProfile nodeProfile : nodeProfiles) {
@@ -127,15 +133,22 @@ public class RuntimePredictor extends RegressionModelCalculator {
             return false;
         }
     }
-    
-    private List<Tuple<Long, Double>> getTrainingData (List<TaskProvenance> taskProvenances) {
+
+    private Map<String, List<Tuple<Long, Double>>> getTrainingAndTestData(List<TaskProvenance> taskProvenances) {
         List<Tuple<Long, Double>> tuples = new ArrayList<>(taskProvenances.stream().map(t ->
                 new Tuple<>(t.getInputSize(), t.getAdjustedRuntime())).toList());
         Collections.shuffle(tuples, new Random());
         // TODO check data split
         int splitIndex = (int) (tuples.size() * 0.8);
         List<Tuple<Long, Double>> trainingData = new ArrayList<>(tuples.subList(0, splitIndex));
-        return trainingData;
+        List<Tuple<Long, Double>> testData = new ArrayList<>(tuples.subList(splitIndex, tuples.size()));
+
+
+        Map<String, List<Tuple<Long, Double>>> splitData = new HashMap<>();
+        splitData.put("trainingData", trainingData);
+        splitData.put("testData", testData);
+
+        return splitData;
     }
 
     private void putRegressionModel(String processName, List<Tuple<Long, Double>> trainingData) {
@@ -146,7 +159,7 @@ public class RuntimePredictor extends RegressionModelCalculator {
         runtimeRegressionModels.put(processName, regression);
         log.info("Regression model fitted for process: {}", processName);
     }
-    
+
     private void putRuntimeMedian(String processName, List<TaskProvenance> taskProvenances) {
         List<Double> adjustedRuntimes = taskProvenances.stream().map(TaskProvenance::getAdjustedRuntime).toList();
         DescriptiveStatistics stats = new DescriptiveStatistics();
@@ -157,4 +170,51 @@ public class RuntimePredictor extends RegressionModelCalculator {
         runtimeMedians.put(processName, median);
         log.info("Runtime median {} computed for process: {}", median, processName);
     }
+
+
+    private void calculateAccuracyOfModel(String processName, List<Tuple<Long, Double>> testData) {
+        ArrayList<Double> yTestPredicted = new ArrayList<>();
+        ArrayList<Double> yTestActual = new ArrayList<>();
+
+
+        if (runtimeRegressionModels.containsKey(processName)) {
+            SimpleRegression regressionModel = runtimeRegressionModels.get(processName);
+
+            for (Tuple<Long, Double> tuple : testData) {
+                Long inputSize = tuple.getInputSize();
+                double runtime = tuple.getRuntime();
+                yTestPredicted.add(regressionModel.predict(inputSize));
+                yTestActual.add(runtime);
+
+            }
+
+
+        }
+
+        double rSquared = calculateRSquared(yTestPredicted, yTestActual);
+
+        log.info("Process name: " + processName + "; Test set accuracy: " + rSquared);
+
+
+    }
+
+    private double calculateRSquared(ArrayList<Double> yTestPredicted, ArrayList<Double> yTestActual) {
+        double meanYTestActual = 0;
+
+        meanYTestActual = StatUtils.mean(yTestActual.stream().mapToDouble(Double::doubleValue).toArray());
+
+        double ssTot = 0;
+        for (Double value : yTestActual) {
+            ssTot += Math.pow(value - meanYTestActual, 2);
+        }
+
+        double ssRes = 0;
+        for (int i = 0; i < yTestActual.size(); i++) {
+            ssRes += Math.pow(yTestActual.get(i) - yTestPredicted.get(i), 2);
+        }
+
+        return 1 - (ssRes / ssTot);
+    }
+
+
 }

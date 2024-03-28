@@ -134,6 +134,8 @@ public class Task {
 
         Map<String, Double> predictionsPerNode = runtimePredictor.predict(processName, inputSize);
         log.info("Predicted runtimes: " + predictionsPerNode);
+
+        //"Accuracy: ...
         this.nodeRuntimeEstimates.putAll(predictionsPerNode);
     }
 
