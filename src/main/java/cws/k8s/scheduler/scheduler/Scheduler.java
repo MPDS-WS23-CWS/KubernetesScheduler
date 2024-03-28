@@ -98,15 +98,19 @@ public abstract class Scheduler implements Informable {
             }
         }
 
+        // Add inputSize labels to pods - needed for provenance collector
+        for (Task unscheduledTask: unscheduledTasks) {
+            try {
+                addInputSizeLabel( unscheduledTask );
+            }  catch ( Exception e ){
+                log.info( "Could not add input size label to pod {}", unscheduledTask.getPod().getName() );
+                e.printStackTrace();
+            }
+        }
+
         int failure = 0;
         int scheduled = 0;
         for (NodeTaskAlignment nodeTaskAlignment : taskNodeAlignment) {
-            try {
-                addInputSizeLabel( nodeTaskAlignment );
-            }  catch ( Exception e ){
-                log.info( "Could not add input size label to pod {}", nodeTaskAlignment.task.getPod().getName() );
-                e.printStackTrace();
-            }
             try {
                 if (isClose()) {
                     return -1;
@@ -557,11 +561,10 @@ public abstract class Scheduler implements Informable {
     /**
      * Add input size label to pod. Allows provenance collector to scrape this data.
      */
-    void addInputSizeLabel(NodeTaskAlignment alignment) {
-        PodWithAge pod = alignment.task.getPod();
-
+    void addInputSizeLabel(Task task) {
+        PodWithAge pod = task.getPod();
         client.pods().inNamespace(pod.getMetadata().getNamespace()).withName(pod.getName()).edit(p ->
-                new PodBuilder(p).editMetadata().addToLabels("input_size", String.valueOf(alignment.task.getInputSize())).and().build());
+                new PodBuilder(p).editMetadata().addToLabels("input_size", String.valueOf(task.getInputSize())).and().build());
     }
 
 }
