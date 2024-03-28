@@ -122,10 +122,10 @@ public class RuntimePredictor extends RegressionModelCalculator {
 
             //if (pearson < 0.75 || spearman < 0.75 || Double.isNaN(pearson) || Double.isNaN(spearman)) {
             if (pearson < 0.5 || Double.isNaN(pearson)) {
-                log.info("Data for process {} is not correlated: Pearson {}", processName, pearson);
+                log.info("Data not correlated for process {} (Pearson: {})", processName, pearson);
                 return false;
             } else {
-                log.info("Data for process {} is correlated: Pearson {}", processName, pearson);
+                log.info("Data correlated for process {} (Pearson: {})", processName, pearson);
                 return true;
             }
         } catch (MathIllegalArgumentException e) {
@@ -143,8 +143,7 @@ public class RuntimePredictor extends RegressionModelCalculator {
         Collections.shuffle(tuples, new Random());
         // TODO check data split
         int splitIndex = (int) (tuples.size() * 0.8);
-        List<Tuple<Long, Double>> trainingData = new ArrayList<>(tuples.subList(0, splitIndex));
-        return trainingData;
+        return new ArrayList<>(tuples.subList(0, splitIndex));
     }
 
     private void putRegressionModel(String processName, List<Tuple<Long, Double>> trainingData) {
