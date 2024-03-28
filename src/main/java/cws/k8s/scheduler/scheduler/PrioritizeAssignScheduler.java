@@ -21,7 +21,6 @@ public class PrioritizeAssignScheduler extends Scheduler {
     private final Prioritize prioritize;
     private final NodeAssign nodeAssigner;
     private final RuntimePredictor runtimePredictor;
-    private final NodeProfiler profiler;
     private final ProvenanceRestClient provenanceRestClient;
 
     public PrioritizeAssignScheduler( String execution,
@@ -33,8 +32,7 @@ public class PrioritizeAssignScheduler extends Scheduler {
         super(execution, client, namespace, config);
         this.prioritize = prioritize;
         this.nodeAssigner = nodeAssigner;
-        this.profiler = new NodeProfiler();
-        this.runtimePredictor = new RuntimePredictor(this.profiler);
+        this.runtimePredictor = new RuntimePredictor(new NodeProfiler());
         this.provenanceRestClient = new ProvenanceRestClient();
         nodeAssigner.registerScheduler( this );
         if ( nodeAssigner instanceof Informable ){

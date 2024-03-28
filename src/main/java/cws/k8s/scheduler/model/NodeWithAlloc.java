@@ -28,7 +28,6 @@ public class NodeWithAlloc extends Node implements Comparable<NodeWithAlloc> {
 
     private final List<PodWithAge> startingTaskCopyingData = new LinkedList<>();
 
-    @Setter
     private float NodeRanking;
 
     public NodeWithAlloc( String name ) {

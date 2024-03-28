@@ -43,7 +43,6 @@ public class Task {
     @Setter
     // maps node name to runtime estimate (in seconds)
     private Map<String, Double> nodeRuntimeEstimates;
-//    private Map<NodeWithAlloc, Double> nodeRuntimeEstimates;
 
     @Getter
     @Setter

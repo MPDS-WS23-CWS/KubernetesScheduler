@@ -17,10 +17,10 @@ import java.util.Optional;
 @Component
 @Slf4j
 public class NodeProfiler {
-    private String csvPath = "/data/benchmark.csv";
+    private final String csvPath = "/data/benchmark.csv";
 
     @Getter
-    private List<NodeProfile> nodeProfiles = new ArrayList<>();
+    private final List<NodeProfile> nodeProfiles = new ArrayList<>();
 
     public NodeProfiler() {
         parseFactor();
