@@ -121,7 +121,7 @@ public class RuntimePredictor extends RegressionModelCalculator {
             double pearson = pearsonsCorrelation.correlation(inputSizes, adjustedRuntimes);
 
             //if (pearson < 0.75 || spearman < 0.75 || Double.isNaN(pearson) || Double.isNaN(spearman)) {
-            if (pearson < 0.5 || Double.isNaN(pearson)) {
+            if (pearson < 0.6 || Double.isNaN(pearson)) {
                 log.info("Data not correlated for process {} (Pearson: {})", processName, pearson);
                 return false;
             } else {

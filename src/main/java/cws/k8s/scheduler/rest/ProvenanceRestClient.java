@@ -3,19 +3,28 @@ package cws.k8s.scheduler.rest;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
+//@Service
 public class ProvenanceRestClient {
+//    @Autowired
     private final WebClient webClient;
     String provenanceDbApiUrl = System.getenv("PROVENANCE_DB_API_URL");
     int provenanceDbApiPort = Integer.parseInt(System.getenv("PROVENANCE_DB_API_PORT"));
 
     public ProvenanceRestClient() {
-        this.webClient = WebClient.builder().build();
+        final int size = 256 * 1024 * 1024;
+        final ExchangeStrategies strategies = ExchangeStrategies.builder()
+                .codecs(codecs -> codecs.defaultCodecs().maxInMemorySize(size))
+                .build();
+        this.webClient = WebClient.builder().exchangeStrategies(strategies).build();
     }
 
     // maps process names to TaskProvenance objects

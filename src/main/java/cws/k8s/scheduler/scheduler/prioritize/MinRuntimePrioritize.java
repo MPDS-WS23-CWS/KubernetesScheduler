@@ -21,7 +21,7 @@ public class MinRuntimePrioritize implements Prioritize {
         } );
     }
 
-    //Handles no estimate available, sorts to end
+    //Handles no estimate available, sorts to beginning
     public Integer compare(Double x, Double y){
         if(x == null && y == null) return 0;
         if(x == null) return 1;
