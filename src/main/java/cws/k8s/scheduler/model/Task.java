@@ -3,7 +3,7 @@ package cws.k8s.scheduler.model;
 import cws.k8s.scheduler.dag.DAG;
 import cws.k8s.scheduler.dag.Process;
 import cws.k8s.scheduler.model.tracing.TraceRecord;
-import cws.k8s.scheduler.predictor.model.RuntimePredictor;
+import cws.k8s.scheduler.predictor.RuntimePredictor;
 import cws.k8s.scheduler.util.Batch;
 import lombok.Getter;
 import lombok.Setter;

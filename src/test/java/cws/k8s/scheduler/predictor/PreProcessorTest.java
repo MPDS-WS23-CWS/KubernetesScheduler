@@ -1,6 +1,6 @@
 // package cws.k8s.scheduler.predictor;
 
-// import cws.k8s.scheduler.predictor.model.Tuple;
+// import cws.k8s.scheduler.predictor.Tuple;
 // import cws.k8s.scheduler.predictor.model.PreProcessor;
 // import cws.k8s.scheduler.rest.TaskProvenance;
 // import org.junit.jupiter.api.Test;

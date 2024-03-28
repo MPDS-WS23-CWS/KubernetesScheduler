@@ -1,4 +1,4 @@
-package cws.k8s.scheduler.predictor.domain;
+package cws.k8s.scheduler.predictor;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -17,8 +17,6 @@ import java.util.Optional;
 @Component
 @Slf4j
 public class NodeProfiler {
-
-//    @Value("${profiler.csv-path}")
     private String csvPath = "/data/benchmark.csv";
 
     @Getter
@@ -75,7 +73,7 @@ public class NodeProfiler {
 
                         NodeProfile existingProfile = existingProfileOpt.get();
 
-                        // Werden bei neuem run dann overwritten
+                        // Are overwritten on new run
                         existingProfile.setExecTime(execTime); 
                         existingProfile.setFactor(factor); 
                         log.info("Updated node profile: {} with factor: {}", nodeName, factor);
@@ -91,17 +89,6 @@ public class NodeProfiler {
             log.error("Error reading profiling data from {}", csvPath, e);
         }
     }
-
-    // public void updateNodeFactors() {
-
-    //     for (NodeProfile profile : nodeProfiles) {
-
-    //         kubernetesClient.getallNodes().stream()
-    //         .filter(node -> node.getName().equals(profile.getNodeName());
-    //         .findFirst()
-    //         .ifPresent(node -> node.setFactor(profile.getFactor()));
-    //     }
-    // }
 }
 
 

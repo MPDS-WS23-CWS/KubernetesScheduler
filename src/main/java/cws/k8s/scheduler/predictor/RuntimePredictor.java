@@ -1,8 +1,7 @@
-package cws.k8s.scheduler.predictor.model;
+package cws.k8s.scheduler.predictor;
 
 import cws.k8s.scheduler.rest.TaskProvenance;
-import cws.k8s.scheduler.predictor.domain.NodeProfiler;
-import cws.k8s.scheduler.predictor.domain.NodeProfiler.NodeProfile;
+import cws.k8s.scheduler.predictor.NodeProfiler.NodeProfile;
 
 import java.util.Map;
 import java.util.HashMap;

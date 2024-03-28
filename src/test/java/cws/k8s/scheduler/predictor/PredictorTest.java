@@ -1,6 +1,6 @@
 // package cws.k8s.scheduler.predictor.model;
-// import cws.k8s.scheduler.predictor.model.Tuple;
-// import cws.k8s.scheduler.predictor.model.RegressionModelCalculator;
+// import cws.k8s.scheduler.predictor.Tuple;
+// import cws.k8s.scheduler.predictor.RegressionModelCalculator;
 // import cws.k8s.scheduler.rest.ProvenanceRestClient;
 // import cws.k8s.scheduler.rest.TaskProvenance;
 

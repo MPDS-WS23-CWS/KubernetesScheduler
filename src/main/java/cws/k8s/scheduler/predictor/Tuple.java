@@ -1,4 +1,4 @@
-package cws.k8s.scheduler.predictor.model;
+package cws.k8s.scheduler.predictor;
 
 import lombok.Getter;
 import lombok.Setter;
