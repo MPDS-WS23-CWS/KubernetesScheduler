@@ -3,13 +3,10 @@ package cws.k8s.scheduler.rest;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 //@Service
@@ -33,13 +30,6 @@ public class ProvenanceRestClient {
 
         Map<String, TaskProvenance> taskProvenanceMap = new HashMap<>();
         parseTaskProvenance(tasksJSON, taskProvenanceMap);
-
-        // exclude tasks where the input size is unknown (i.e. -1)
-        taskProvenanceMap = taskProvenanceMap
-                .entrySet()
-                .stream()
-                .filter(t -> t.getValue().getInputSize() != -1)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         Map<String, List<TaskProvenance>> processProvenanceMap = new HashMap<>();
         for (TaskProvenance taskProvenance : taskProvenanceMap.values()) {

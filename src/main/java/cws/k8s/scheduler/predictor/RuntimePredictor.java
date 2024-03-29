@@ -3,12 +3,7 @@ package cws.k8s.scheduler.predictor;
 import cws.k8s.scheduler.rest.TaskProvenance;
 import cws.k8s.scheduler.predictor.NodeProfiler.NodeProfile;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.Collections;
+import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.exception.MathIllegalArgumentException;
@@ -93,7 +88,6 @@ public class RuntimePredictor extends RegressionModelCalculator {
             List<TaskProvenance> taskProvenances = entry.getValue();
 
             log.info("Computing adjusted runtimes for {} (data points: {})", processName, taskProvenances.size());
-//            log.info("Node profiles: " + nodeProfiler.getNodeProfiles().toString());
 
             for (TaskProvenance taskProvenance : taskProvenances) {
                 double runtimeFactor = nodeProfiler.getNodeProfiles().stream()
@@ -113,6 +107,10 @@ public class RuntimePredictor extends RegressionModelCalculator {
 
     private boolean isCorrelated(List<TaskProvenance> taskProvenances) {
         String processName = taskProvenances.get(0).getProcessName();
+
+        // exclude tasks where the input size is unknown (i.e. -1)
+        taskProvenances = taskProvenances.stream().filter(t -> t.getInputSize() != -1).toList();
+
         double[] inputSizes = taskProvenances.stream().mapToDouble(TaskProvenance::getInputSize).toArray();
         double[] adjustedRuntimes = taskProvenances.stream().mapToDouble(TaskProvenance::getAdjustedRuntime).toArray();
 
@@ -120,7 +118,6 @@ public class RuntimePredictor extends RegressionModelCalculator {
             PearsonsCorrelation pearsonsCorrelation = new PearsonsCorrelation();
             double pearson = pearsonsCorrelation.correlation(inputSizes, adjustedRuntimes);
 
-            //if (pearson < 0.75 || spearman < 0.75 || Double.isNaN(pearson) || Double.isNaN(spearman)) {
             if (pearson < 0.6 || Double.isNaN(pearson)) {
                 log.info("Data not correlated for process {} (Pearson: {})", processName, pearson);
                 return false;
@@ -133,15 +130,19 @@ public class RuntimePredictor extends RegressionModelCalculator {
             return false;
         }
     }
-    
+
     private List<Tuple<Long, Double>> getTrainingData (List<TaskProvenance> taskProvenances) {
+        // exclude tasks where the input size is unknown (i.e. -1)
+        taskProvenances = taskProvenances.stream().filter(t -> t.getInputSize() != -1).toList();
+
         List<Tuple<Long, Double>> tuples = new ArrayList<>(
                 taskProvenances
                 .stream()
                 .map(t -> new Tuple<>(t.getInputSize(), t.getAdjustedRuntime()))
                 .toList());
         Collections.shuffle(tuples, new Random());
-        // TODO check data split
+
+        // avoid overfitting
         int splitIndex = (int) (tuples.size() * 0.8);
         return new ArrayList<>(tuples.subList(0, splitIndex));
     }
