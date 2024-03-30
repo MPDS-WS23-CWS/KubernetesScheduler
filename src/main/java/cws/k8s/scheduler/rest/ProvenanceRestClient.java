@@ -9,9 +9,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.*;
 
 @Slf4j
-//@Service
 public class ProvenanceRestClient {
-//    @Autowired
+
     private final WebClient webClient;
     String provenanceDbApiUrl = System.getenv("PROVENANCE_DB_API_URL");
     int provenanceDbApiPort = Integer.parseInt(System.getenv("PROVENANCE_DB_API_PORT"));

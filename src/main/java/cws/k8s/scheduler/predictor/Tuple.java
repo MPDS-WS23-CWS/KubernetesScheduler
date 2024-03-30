@@ -13,4 +13,5 @@ public class Tuple<X, Y> {
         this.inputSize = inputSize;
         this.runtime = runtime;
     }
+
 }

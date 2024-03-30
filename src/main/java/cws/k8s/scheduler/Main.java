@@ -66,32 +66,4 @@ public class Main {
 
         log.info( "\n\n\n" + info + "\n" );
     }
-
-//    @Bean
-//    // avoid DataBufferLimitException for provenance storage
-//    public WebClient webClient() {
-//        final int size = 256 * 1024 * 1024;
-//        final ExchangeStrategies strategies = ExchangeStrategies.builder()
-//                .codecs(codecs -> codecs.defaultCodecs().maxInMemorySize(size))
-//                .build();
-//        return WebClient.builder()
-//                .exchangeStrategies(strategies)
-//                .build();
-//    }
-
-//    @Bean("progWebClient")
-//    public WebClient getProgSelfWebClient() {
-//        final int size = 256 * 1024 * 1024;
-//        return WebClient
-//                .builder()
-//                .exchangeStrategies(ExchangeStrategies
-//                        .builder()
-//                        .codecs(codecs -> codecs
-//                                .defaultCodecs()
-//                                .maxInMemorySize(size))
-//                        .build())
-//                .build();
-//    }
-
 }
-

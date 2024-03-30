@@ -75,7 +75,6 @@ public class RuntimePredictor extends RegressionModelCalculator {
         else {
             for (NodeProfile nodeProfile : nodeProfiles) {
                 predictionsPerNode.put(nodeProfile.getNodeName(), null);
-//                  predictionsPerNode.put(nodeProfile.getNodeName(), (double) Integer.MAX_VALUE);
             }
             log.warn("Runtime model for process " + processName + " not found.");
         }
