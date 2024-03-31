@@ -1,4 +1,11 @@
-# Common Workflow Scheduler for Kubernetes
+# Enhancing Scientific Workflow Efficiency through Runtime-Aware Scheduling
+
+In this repository, you will find an extension of the Common Workflow Scheduler, developed for Master Project Distributed Systems at TU-Berlin.
+
+**Disclaimer**
+The following instructions are based upon the original repository of the Common Workflow Scheduler for Kubernetes and still hold for running our extension. Please follow the steps described underneath. 
+
+# Common Workflow Scheduler for Kubernetes (original)
 [![DOI](https://zenodo.org/badge/596122315.svg)](https://zenodo.org/badge/latestdoi/596122315)
 
 In this repository, you will find the Common Workflow Scheduler for Kubernetes proposed in the paper "**How Workflow Engines Should Talk to Resource Managers: A Proposal for a Common Workflow Scheduling Interface**."
